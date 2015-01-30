@@ -1,0 +1,32 @@
+Package: birte
+Version: 0.99.1
+Date: 2015-01-27
+Title: Bayesian Inference of Regulatory Influence on Expression (biRte)
+Author: Holger Froehlich, contributions by Benedikt Zacher
+Maintainer: Holger Froehlich <frohlich@bit.uni-bonn.de>
+Depends: R(>= 3.0.0), RcppArmadillo (>= 0.3.6.1), Rcpp
+Imports: MASS, limma(>= 3.22.0), ridge, Biobase, nem
+Suggests: knitr
+Enhances: Rgraphviz
+LinkingTo: RcppArmadillo, Rcpp
+NeedsCompilation: yes
+SystemRequirements: BLAS, LAPACK
+Materials: Please enable BLAS and LAPACK for armadillo library (see
+        http://arma.sourceforge.net/faq.html). The file config.hpp can
+        be found under library/RcppArmadillo/include/armadillo_bits.
+Description: Expression levels of mRNA molecules are regulated by
+        different processes, comprising inhibition or activation by
+        transcription factors and post-transcriptional degradation by
+        microRNAs. biRte uses regulatory networks of TFs, miRNAs and
+        possibly other factors, together with mRNA, miRNA and other
+        available expression data to predict the relative influence of
+        a regulator on the expression of its target genes. Inference is
+        done in a Bayesian modeling framework using
+        Markov-Chain-Monte-Carlo. A special feature is the possibility
+        for follow-up network reverse engineering between active
+        regulators.
+License: GPL (>= 2)
+biocViews: Microarray, Sequencing, GeneExpression, Transcription,
+        Network, Bayesian, Regression, NetworkInference
+LazyLoad: yes
+VignetteBuilder: knitr

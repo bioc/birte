@@ -1,0 +1,223 @@
+%\VignetteIndexEntry{Bayesian Inference of Regulation of Transcriptional Activity}
+%\VignetteDepends{}
+%\VignetteKeywords{Regulatory network, network inference, gene expresseion, transcription factor, miRNA}
+%\VignettePackage{birte} % name of package
+\documentclass[a4paper]{article}
+
+
+\title{Bayesian Inference of Regulatory influence on Expression (biRte)}
+\author{Holger Fr\"ohlich}
+
+\SweaveOpts{echo=FALSE}
+\usepackage{a4wide}
+
+\newcommand{\Robject}[1]{{\texttt{#1}}}
+\newcommand{\Rfunction}[1]{{\texttt{#1}}}
+\newcommand{\Rpackage}[1]{{\textit{#1}}}
+\newcommand{\Rclass}[1]{{\textit{#1}}}
+\newcommand{\Rmethod}[1]{{\textit{#1}}}
+\newcommand{\Rfunarg}[1]{{\texttt{#1}}}
+
+
+\begin{document}
+\SweaveOpts{concordance=TRUE}
+
+\maketitle
+
+\section{Introduction}
+Expression levels of mRNA is regulated by different processes, comprising inhibition or activation by transcription factors (TF) and post-transcriptional degradation by microRNAs (miRNA). 
+\Rpackage{biRte} (Bayesian Inference of Regulatory influence on Expression (biRte)) uses the regulatory networks of TFs and miRNAs together with mRNA and miRNA expression data to 
+infer the influence of regulators on mRNA expression. Furthermore, \Rpackage{biRte} allows to consider additional factors such as CNVs. \Rpackage{biRte} has the possibility to specify Bayesian priors for the activity of each individual regulatory factor. Moreover, interaction terms between regulators can be considered.
+\Rpackage{biRte} relies on a Bayesian network model to integrate data sources into a joint likelihood model. In the model mRNA expression levels depend on the activity states of its regulating factors via a sparse Bayesian linear regression using a spikes and slab prior \cite{George1993SpikesAndSlab}. Moreover, miRNA expression levels depend on miRNA activity states.
+\Rpackage{biRte} uses Markov-Chain-Monte-Carlo (MCMC) sampling to infer activity states of regulatory factors. 
+During MCMC, switch moves - toggling the state of a regulator between active and inactive - and swap moves - exchanging the activitiy states of either two miRNAs or two TFs - are used \cite{Zacher2012}. 
+
+\Rpackage{biRte} is meant as a replacement for the earlier package \Rpackage{birta}. \Rpackage{biRte} offers several advantages compared to \Rpackage{birta}.
+\begin{itemize}
+\item possibility to include additional regulatory factors and data apart from TFs and miRNAs
+\item possibility to include target specific regulation strength values
+\item possibility to define a prior probabilities for activity of each individual regulator and even regulator pairs.
+\item significantly faster inference (about 15 fold speed-up)
+\item significantly higher accuracy of inference due to improved likelihood calculation
+\item inference of regulatory networks as a follow-up step
+\end{itemize}
+
+The package can be loaded by typing:
+<<loading library, echo=TRUE, results=hide>>=
+rm(list=ls())
+library(birte)
+@
+
+\section{Usage of biRte} 
+The two main functions of the package are \Rfunction{birteRun} and \Rfunction{birteLimma}. \Rfunction{birteLimma} is a convenience function, which passes the output of \Rfunction{limmaAnalysis} to \Rfunction{birteRun}. The most important input arguments to \Rfunction{birteRun} are 
+
+\begin{itemize}  
+  \item \textbf{dat.mRNA}. Matrix of mRNA expression data with row names indicating genes.   
+  \item \textbf{affinities}. A weighted regulator-target graph. This is a list with at most three components (TF, miRNA, other). Each of these lists again contains a weighted adjacency list representation. See \Robject{affinities} for more information and \Robject{humanNetworkSimul} for an example. Per default weights are ignored in the inference process. IMPORTANT: gene names used in this network have to match with row names of dat.mRNA. 
+\item \textbf{nrep.mRNA} is an integer vector, which specifies the number of replicates per condition for mRNA data  
+\end{itemize}
+
+\section{Applying biRte to RNAseq Data}
+\Rpackage{biRte} relies on the assumption that data are (multivariate) normally distributed. Application to RNAseq data is thus not immediately possible. Data should thus be transformed appropriately, e.g. via the voom + limma mechanism \cite{Law2014}.
+
+\section{Example: Aerobic vs. anaerobic growth in E. Coli}
+To demonstrate the use of \Rpackage{biRte} we here show a most basic application to a microarray dataset by \cite{Covert2004} together with a filtered TF-target graph \cite{Castelo2009}. The gene expression data comprises three replicates from E. Coli during aerobic growth and four replicates during anaerobic growth. The TF-target graph contains annotations for 160 transcription factors. Expression values are stored in an \Rclass{ExpressionSet}.
+
+<<EColi eSet, echo=TRUE>>=
+library(Biobase)
+data(EColiOxygen)
+EColiOxygen
+head(exprs(EColiOxygen))
+@
+
+Before starting our biRte analysis we try to simplify the TF-target by clustering regulators with highly overlapping target gene sets. Then we determine possible interactions between regulators by looking for regulators, which have an overlap that is large enough to be considered, but not as large that the effect is indistinguishable from main effects by individual regulators. 
+
+Afterwards, differentially expressed genes are calculated using \Rfunction{limmaAnalysis}. The result is then passed to \Rfunction{biRteLimma}, together with the TF-target graph \Robject{EColiNetwork}. As a final step we use biRte to look for regulator activities that can explain differential gene expression between anaerobic and aerobic growth. In a real application the number of MCMC iterations should be increased significantly:
+
+<<EColi, echo=TRUE, results=hide>>=
+# prepare network
+affinities = list(TF=sapply(names(EColiNetwork$TF), function(tf){w = rep(1, length(EColiNetwork$TF[[tf]])); names(w)= EColiNetwork$TF[[tf]]; w}))
+affinities = simplify(affinities)
+affinities$other = proposeInteractions(affinities)
+# prepare data
+colnames(exprs(EColiOxygen)) = make.names(paste(pData(EColiOxygen)$GenotypeVariation, pData(EColiOxygen)$GrowthProtocol, sep="."))
+limmamRNA = limmaAnalysis(exprs(EColiOxygen), design=NULL, "wild.type.anaerobic - wild.type.aerobic")
+mydat = cbind(exprs(EColiOxygen)[,colnames(exprs(EColiOxygen)) =="wild.type.aerobic"],  exprs(EColiOxygen)[,colnames(exprs(EColiOxygen)) == "wild.type.anaerobic"])
+
+ecoli_result = birteLimma(dat.mRNA=mydat, limmamRNA=limmamRNA, affinities=affinities, niter=500, nburnin=5000, thin=1)
+@
+
+<<ecoli log-lik plot dummy, echo=TRUE, eval=FALSE, results=hide>>=
+plotConvergence(ecoli_result, title="E. Coli")
+@
+
+<<ecoli log-lik plot, echo=FALSE, results=hide>>=
+pdf("loglik_ecoli.pdf")
+plotConvergence(ecoli_result, title="E. Coli")
+dev.off()	
+@
+
+\begin{figure}[htp]
+  \centering
+\includegraphics[width=9cm]{loglik_ecoli.pdf}
+\caption{Log-likelihood during MCMC sampling for the E. Coli data set.}
+\label{figure2}
+\end{figure}
+
+The log-likelihood is shown in Figure \ref{figure2}. Below we show those TFs, who reveal a marginal activity probability of larger than a cutoff corresponding to an expected false positve rate of 0.001. We look at the total number of target genes together with the number of differentially expressed target genes for the predicted TFs:
+
+<<EColi active TFs, echo=TRUE>>=
+tau = suggestThreshold(ecoli_result$post[,1])
+activeTFs = rownames(ecoli_result$post)[ecoli_result$post[,1] > tau]
+activeTFs
+@
+
+<<ecoli DE genes, echo=TRUE>>=
+if(length(activeTFs) > 0){
+	DEgenes = rownames(limmamRNA$pvalue.tab)[limmamRNA$pvalue.tab$adj.P.Val < 0.05]
+	genesetsTF = sapply(affinities$TF, names)
+	DEgenesInTargets = sapply(genesetsTF[intersect(activeTFs, names(genesetsTF))], 
+	function(x) c(length(which(x %in% DEgenes)), length(x)))
+	rownames(DEgenesInTargets) = c("#DEgenes", "#targets")
+	DEgenesInTargets[,order(DEgenesInTargets["#targets",], decreasing=TRUE)]
+}
+@
+
+We can ask, how well log fold changes predicted by our biRte model agree with obseved log fold changes:
+
+<<EColi predict expr, echo=TRUE>>=
+pred = birtePredict(ecoli_result, rownames(mydat))
+cor(pred[[1]][[1]]$mean, limmamRNA$pvalue.tab[rownames(mydat), "logFC"])
+@
+
+Once again it should be noted that in a real application the MCMC sampler should run much longer and hence better results are expected.
+
+\section{Using Regulator Expression Data}
+One of the strength of \Rpackage{biRte} is that measurements of regulators can be integrated smoothly into the inferenceprocess. 
+
+In our example situation no miRNA expression data is available, but some transcription factors have been measured on the microarray. In accordance with published results \cite{Wu2011}, \Rpackage{biRte} does not suppose that the mRNA expression levels of a TF and its (putative) target genes are correlated. However, differential TF expression on mRNA level might still give a hint on activity differences on protein level. Thus, \Rpackage{biRte} allows to integrate expression data of differentially expressed TFs.In our case \Robject{TFexpr} contains an excerpt of \Robject{EColiOxygen}. It comprises mRNA expression for all 160 TFs in \Robject{EColiNetwork}. The row names of the expression matrix were converted to the corresponding TF identifiers in \Robject{EColiNetwork}.
+
+<<EColi TF expression, echo=TRUE>>=
+head(exprs(TFexpr))
+@
+
+Differential expression of these TFs can be assessed by subsetting our previous $\mathtt{limmamRNA}$ object. We use the obtained results to define an informative prior for each regulator and regulator-regulator interaction, before running a biRte analysis, and to set up a reasonable initial state for the sampler:
+
+<<EColi TFexpr, echo=TRUE, results=hide>>=
+limmaTF = limmamRNA
+limmaTF$pvalue.tab = limmaTF$pvalue.tab[rownames(limmaTF$pvalue.tab) %in% fData(TFexpr)$Entrez, ]
+names(limmaTF$lm.fit$sigma) = as.character(fData(EColiOxygen)$symbol[match(names(limmaTF$lm.fit$sigma), fData(EColiOxygen)$Entrez)])
+rownames(limmaTF$pvalue.tab) = as.character(fData(EColiOxygen)$symbol[match(rownames(limmaTF$pvalue.tab), fData(EColiOxygen)$Entrez)])
+diff.TF = rownames(limmaTF$pvalue.tab)[limmaTF$pvalue.tab$adj.P.Val < 0.05]
+theta.TF = rep(1/length(affinities$TF), length(affinities$TF))
+names(theta.TF) = names(affinities$TF)
+theta.other = rep(1/length(affinities$other), length(affinities$other))
+names(theta.other) = names(affinities$other)
+theta.other[unique(unlist(sapply(diff.TF, function(tf) grep(tf, names(theta.other)))))] = 0.5 # assume an a priori 50% activity probability for differentially expressed TFs
+init.TF = theta.TF
+init.TF = (init.TF >= 0.5)*1
+init.other = theta.other
+init.other = (init.other >= 0.5)*1
+
+# note that niter and nburnin are much too small in practice
+ecoli_TFexpr = birteLimma(dat.mRNA=mydat, data.regulators=list(TF=exprs(TFexpr)), limmamRNA=limmamRNA, limma.regulators=list(TF=limmaTF), theta.regulators=list(TF=theta.TF, other=theta.other), init.regulators=list(TF=init.TF, other=init.other), affinities=affinities, niter=500, nburnin=1000, thin=1, only.diff.TFs=TRUE)
+@ 
+
+<<EColi TFexpr result, echo=TRUE>>=
+tau = suggestThreshold(ecoli_TFexpr$post[,1])
+activeTFs = ecoli_TFexpr$post[ecoli_TFexpr$post[,1] > tau,1]
+activeTFs
+@ 
+
+\section{Network Inference}
+After having determined active regulators one may ask, in which way these regulators influence each other. Bayesian Networks are a principal possibility, but would usually require direct measurements of regulators, which is difficult to obtain for TFs. Moreover, the typically small sample size imposes a principal limitation. We thus restrict ourselves to subset relationships between differentially expressed target genes. These subset relationships can have two possible interpretations: One possibility is that egulator A acts upstream of regulator B, if differential targets of B are a subset of those of A. Another possibility is that A and B jointly co-regulate certain target genes. The idea of (noisy) subset relationships has striking similarities to Nested Effects Models (NEMs) \cite{Markowetz2005Inference, Froehlich2009}, which have been introduced for causal network inference from perturbation data. Although in our case we do not have targeted perturbations of individual regulators, probabilistic inference of subset relationships between differentially expressed targets of regulator pairs can be effectively solved via NEM inference. \Rpackage{biRte} uses the pair-wise inference algorithm discussed in \cite{Markowetz2007} as default.  
+
+\Rpackage{biRte} offers a convenience function \Rfunction{estimateNetwork} for this purpose. The function decomposes clusters of active regulators into individual regulators and performs appropriate calls to functions from \Rpackage{nem} \cite{Froehlich2008NEMPackage}. The output is a network indicating subset relationships between differential targets of active regulators. In our example this would be done as follows:
+
+<<network inference, echo=TRUE, results=hide>>=
+DEgenes = rownames(limmamRNA$pvalue.tab)[limmamRNA$pvalue.tab$adj.P.Val < 0.05 & abs(limmamRNA$pvalue.tab$logFC) > 1]
+net = estimateNetwork(ecoli_TFexpr, thresh=tau, de.genes=DEgenes)
+library(nem)
+if(require(Rgraphviz)){  
+  plot(net, transitiveReduction=TRUE)
+}
+@
+This yields the network shown in Figure \ref{figure3}. In addition to the network structure we can investigate the estimated dependencies regulator-gene dependencies in more depth. This may give additional insights whether a particular gene is a direct target of a particular transcription factor or not and hence allow for filtering out false positive target predictions:
+
+<<assignments, echo=TRUE, results=hide>>=  
+net$mappos
+@
+In our case there are several totally unspecific target genes (assigned to "null"), which may indicate false positive target gene predictions. 
+<<network plot, echo=FALSE, results=hide>>=
+if(require(Rgraphviz) & require(nem)){  
+  pdf("nemNetwork.pdf")
+  plot(net, transitiveReduction=TRUE)
+  dev.off()
+}
+@
+
+\begin{figure}[htp]
+  \centering
+\includegraphics[width=9cm]{nemNetwork.pdf}
+\caption{Inferred network between active TFs.}
+\label{figure3}
+\end{figure}
+
+\section{Conclusion}
+\Rpackage{biRte} integrates regulator expression and mRNA data into a probabilistic framework to make inference on regulator activities. It is a step towards the important goal to unravel causal mechanisms of gene expression changes under specific experimental or natural conditions. A unique feature is the combination with network inference.
+\\
+This vignette was generated using the following package versions:
+
+<<sessionInfo, echo=FALSE, results=tex>>=
+toLatex(sessionInfo())
+@
+
+
+\bibliographystyle{abbrv}
+\bibliography{bibliography}
+
+
+
+\end{document}
+
+

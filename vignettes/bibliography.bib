@@ -1,0 +1,617 @@
+% This file was created with JabRef 2.5.
+% Encoding: ISO8859_1
+
+@Article{Froehlich2008NEMPackage,
+  Title                    = {{Analyzing gene perturbation screens with nested effects models in R and bioconductor}},
+  Author                   = {H. Fr\"ohlich and T. Bei{\ss}barth and A. Tresch and D. Kostka and J. Jacob and R. Spang and F. Markowetz},
+  Journal                  = {Bioinformatics},
+  Year                     = {2008},
+
+  Month                    = {Nov},
+  Number                   = {21},
+  Pages                    = {2549--2550},
+  Volume                   = {24},
+
+  Abstract                 = {Nested effects models (NEMs) are a class of probabilistic models introduced to analyze the effects of gene perturbation screens visible in high-dimensional phenotypes like microarrays or cell morphology. NEMs reverse engineer upstream/downstream relations of cellular signaling cascades. NEMs take as input a set of candidate pathway genes and phenotypic profiles of perturbing these genes. NEMs return a pathway structure explaining the observed perturbation effects. Here, we describe the package nem, an open-source software to efficiently infer NEMs from data. Our software implements several search algorithms for model fitting and is applicable to a wide range of different data types and representations. The methods we present summarize the current state-of-the-art in NEMs. AVAILABILITY: Our software is written in the R language and freely avail-able via the Bioconductor project at http://www.bioconductor.org.},
+  Doi                      = {10.1093/bioinformatics/btn446},
+  Institution              = {German Cancer Research Center, INF 580, 69120 Heidelberg, Germany.},
+  Keywords                 = {Algorithms; Gene Expression; Gene Expression Profiling; Models, Statistical; Oligonucleotide Array Sequence Analysis; Software; User-Computer Interface},
+  Owner                    = {froehlih},
+  Pii                      = {btn446},
+  Pmid                     = {18718939},
+  Timestamp                = {2008.11.25}
+}
+
+@Article{Markowetz2007,
+  Title                    = {Nested Effects Models for High-dimensional Phenotyping Screens},
+  Author                   = {F. Markowetz and D. Kostka and O. Troyanskaya and R. Spang},
+  Journal                  = {Bioinformatics},
+  Year                     = {2007},
+  Pages                    = {i305 - i312},
+  Volume                   = {23},
+
+  File                     = {MarkowetzISMB07.pdf:/home/froehlih/Papers/Artikel/MarkowetzISMB07.pdf:PDF},
+  Owner                    = {froehlih},
+  Timestamp                = {2006.11.28}
+}
+
+
+@Article{Froehlich2009,
+  Title                    = {Nested effects models for learning signaling networks from perturbation data.},
+  Author                   = {Fr{\"{o}}hlich, Holger and Tresch, Achim and Beissbarth, Tim},
+  Journal                  = {Biom J},
+  Year                     = {2009},
+
+  Month                    = {Apr},
+  Number                   = {2},
+  Pages                    = {304--323},
+  Volume                   = {51},
+
+  Abstract                 = {Targeted gene perturbations have become a major tool to gain insight into complex cellular processes. In combination with the measurement of downstream effects via DNA microarrays, this approach can be used to gain insight into signaling pathways. Nested Effects Models were first introduced by Markowetz et al. as a probabilistic method to reverse engineer signaling cascades based on the nested structure of downstream perturbation effects. The basic framework was substantially extended later on by Fröhlich et al., Markowetz et al., and Tresch and Markowetz. In this paper, we present a review of the complete methodology with a detailed comparison of so far proposed algorithms on a qualitative and quantitative level. As an application, we present results on estimating the signaling network between 13 genes in the ER-alpha pathway of human MCF-7 breast cancer cells. Comparison with the literature shows a substantial overlap.},
+  Doi                      = {10.1002/bimj.200800185},
+  Institution              = {German Cancer Research Center (DKFZ), Im Neuenheimer Feld 580, 69120 Heidelberg, Germany. h.froehlich@dkfz-heidelberg.de},
+  Keywords                 = {Cell Line, Tumor; Estrogen Receptor alpha, metabolism; Female; Humans; Models, Statistical; Signal Transduction; Software},
+  Language                 = {eng},
+  Medline-pst              = {ppublish},
+  Owner                    = {frohlich},
+  Pmid                     = {19358219},
+  Timestamp                = {2014.12.10},
+  Url                      = {http://dx.doi.org/10.1002/bimj.200800185}
+}
+
+
+Article{Markowetz2005inference,
+  Title                    = {Non-transcriptional pathway features reconstructed from secondary effects of RNA interference.},
+  Author                   = {Florian Markowetz and Jacques Bloch and Rainer Spang},
+  Journal                  = {Bioinformatics},
+  Year                     = {2005},
+
+  Month                    = {Nov},
+  Number                   = {21},
+  Pages                    = {4026--4032},
+  Volume                   = {21},
+
+  Abstract                 = {MOTIVATION: Cellular signaling pathways, which are not modulated on a transcriptional level, cannot be directly deduced from expression profiling experiments. The situation changes, when external interventions such as RNA interference or gene knock-outs come into play. Even if the expression of the signaling genes is not changed, secondary effects in downstream genes shed light on the pathway, and allow partial reconstruction of its topology. RESULTS: We introduce an algorithm to infer non-transcriptional pathway features based on differential gene expression in silencing assays. We demonstrate the power of our algorithm in the controlled setting of simulation studies, and explain its practical use in the context of an RNA interference dataset investigating the response to microbial challenge in Drosophila melanogaster.},
+  Doi                      = {10.1093/bioinformatics/bti662},  
+  Keywords                 = {Algorithms; Computer Simulation; Gene Expression Profiling, methods; Gene Expression Regulation, physiology; Models, Biological; Pattern Recognition, Automated, methods; Proteome, genetics/metabolism; RNA Interference, physiology; Signal Transduction, physiology; Transcription Factors, genetics/metabolism; Transcriptional Activation, physiology},
+  Owner                    = {holfro},
+  Pii                      = {bti662},
+  Pmid                     = {16159925},
+  Timestamp                = {2009.12.08},
+  Url                      = {http://dx.doi.org/10.1093/bioinformatics/bti662}
+}
+
+
+@Article{Law2014,
+  Title                    = {voom: Precision weights unlock linear model analysis tools for RNA-seq read counts.},
+  Author                   = {Law, Charity W. and Chen, Yunshun and Shi, Wei and Smyth, Gordon K.},
+  Journal                  = {Genome Biol},
+  Year                     = {2014},
+  Number                   = {2},
+  Pages                    = {R29},
+  Volume                   = {15},
+
+  Abstract                 = {New normal linear modeling strategies are presented for analyzing read counts from RNA-seq experiments. The voom method estimates the mean-variance relationship of the log-counts, generates a precision weight for each observation and enters these into the limma empirical Bayes analysis pipeline. This opens access for RNA-seq analysts to a large body of methodology developed for microarrays. Simulation studies show that voom performs as well or better than count-based RNA-seq methods even when the data are generated according to the assumptions of the earlier methods. Two case studies illustrate the use of linear modeling and gene set testing methods.},
+  Doi                      = {10.1186/gb-2014-15-2-r29},
+  Language                 = {eng},
+  Medline-pst              = {epublish},
+  Owner                    = {frohlich},
+  Pii                      = {gb-2014-15-2-r29},
+  Pmid                     = {24485249},
+  Timestamp                = {2014.11.18},
+  Url                      = {http://dx.doi.org/10.1186/gb-2014-15-2-r29}
+}
+
+@Article{Vejnar2012,
+  Title                    = {MiRmap: comprehensive prediction of microRNA target repression strength.},
+  Author                   = {Vejnar, Charles E. and Zdobnov, Evgeny M.},
+  Journal                  = {Nucleic Acids Res},
+  Year                     = {2012},
+
+  Month                    = {Dec},
+  Number                   = {22},
+  Pages                    = {11673--11683},
+  Volume                   = {40},
+
+  Abstract                 = {MicroRNAs, or miRNAs, post-transcriptionally repress the expression of protein-coding genes. The human genome encodes over 1000 miRNA genes that collectively target the majority of messenger RNAs (mRNAs). Base pairing of the so-called miRNA 'seed' region with mRNAs identifies many thousands of putative targets. Evaluating the strength of the resulting mRNA repression remains challenging, but is essential for a biologically informative ranking of potential miRNA targets. To address these challenges, predictors may use thermodynamic, evolutionary, probabilistic or sequence-based features. We developed an open-source software library, miRmap, which for the first time comprehensively covers all four approaches using 11 predictor features, 3 of which are novel. This allowed us to examine feature correlations and to compare their predictive power in an unbiased way using high-throughput experimental data from immunopurification, transcriptomics, proteomics and polysome fractionation experiments. Overall, target site accessibility appears to be the most predictive feature. Our novel feature based on PhyloP, which evaluates the significance of negative selection, is the best performing predictor in the evolutionary category. We combined all the features into an integrated model that almost doubles the predictive power of TargetScan. miRmap is freely available from http://cegg.unige.ch/mirmap.},
+  Doi                      = {10.1093/nar/gks901},
+  Institution              = {Department of Genetic Medicine and Development, University of Geneva, Rue Michel-Servet 1, 1211 Geneva 4, Switzerland.},
+  Keywords                 = {Base Pairing; Evolution, Molecular; Gene Expression Regulation; HeLa Cells; Humans; MicroRNAs, chemistry/metabolism; Probability; RNA, Messenger, chemistry/metabolism; Software; Thermodynamics},
+  Language                 = {eng},
+  Medline-pst              = {ppublish},
+  Owner                    = {frohlich},
+  Pii                      = {gks901},
+  Pmid                     = {23034802},
+  Timestamp                = {2014.11.18},
+  Url                      = {http://dx.doi.org/10.1093/nar/gks901}
+}
+
+@ARTICLE{Betel2008,
+  author = {Doron Betel and Manda Wilson and Aaron Gabow and Debora S Marks and
+	Chris Sander},
+  title = {The microRNA.org resource: targets and expression.},
+  journal = {Nucleic Acids Res},
+  year = {2008},
+  volume = {36},
+  pages = {D149--D153},
+  number = {Database issue},
+  month = {Jan},
+  abstract = {MicroRNA.org (http://www.microrna.org) is a comprehensive resource
+	of microRNA target predictions and expression profiles. Target predictions
+	are based on a development of the miRanda algorithm which incorporates
+	current biological knowledge on target rules and on the use of an
+	up-to-date compendium of mammalian microRNAs. MicroRNA expression
+	profiles are derived from a comprehensive sequencing project of a
+	large set of mammalian tissues and cell lines of normal and disease
+	origin. Using an improved graphical interface, a user can explore
+	(i) the set of genes that are potentially regulated by a particular
+	microRNA, (ii) the implied cooperativity of multiple microRNAs on
+	a particular mRNA and (iii) microRNA expression profiles in various
+	tissues. To facilitate future updates and development, the microRNA.org
+	database structure and software architecture is flexibly designed
+	to incorporate new expression and target discoveries. The web resource
+	provides users with functional information about the growing number
+	of microRNAs and their interaction with target genes in many species
+	and facilitates novel discoveries in microRNA gene regulation.},
+  doi = {10.1093/nar/gkm995},
+  institution = {Computational and Systems Biology Center, Memorial Sloan-Kettering
+	Cancer Center, NY, USA.},
+  keywords = {Animals; Binding Sites; Computer Graphics; Databases, Genetic; Gene
+	Expression Profiling; Gene Silencing; Humans; Internet; Mice; MicroRNAs;
+	RNA, Messenger; Rats; User-Computer Interface},
+  owner = {frohlich},
+  pii = {gkm995},
+  pmid = {18158296},
+  timestamp = {2011.08.30},
+  url = {http://dx.doi.org/10.1093/nar/gkm995}
+}
+
+@ARTICLE{Georg1993SpikesAndSlab,
+author = {E. George and R. McCulloch},
+title={Variable selection via Gibbs sampling},
+journal = {J. Am. Stat. Assoc.},
+year=1993,
+volume=88,
+pages={881--889}
+}
+
+@ARTICLE{Castelo2009,
+  author = {Robert Castelo and Alberto Roverato},
+  title = {Reverse engineering molecular regulatory networks from microarray
+	data with qp-graphs.},
+  journal = {J Comput Biol},
+  year = {2009},
+  volume = {16},
+  pages = {213--227},
+  number = {2},
+  month = {Feb},
+  abstract = {Reverse engineering bioinformatic procedures applied to high-throughput
+	experimental data have become instrumental in generating new hypotheses
+	about molecular regulatory mechanisms. This has been particularly
+	the case for gene expression microarray data, where a large number
+	of statistical and computational methodologies have been developed
+	in order to assist in building network models of transcriptional
+	regulation. A major challenge faced by every different procedure
+	is that the number of available samples n for estimating the network
+	model is much smaller than the number of genes p forming the system
+	under study. This compromises many of the assumptions on which the
+	statistics of the methods rely, often leading to unstable performance
+	figures. In this work, we apply a recently developed novel methodology
+	based in the so-called q-order limited partial correlation graphs,
+	qp-graphs, which is specifically tailored towards molecular network
+	discovery from microarray expression data with p >> n. Using experimental
+	and functional annotation data from Escherichia coli, here we show
+	how qp-graphs yield more stable performance figures than other state-of-the-art
+	methods when the ratio of genes to experiments exceeds one order
+	of magnitude. More importantly, we also show that the better performance
+	of the qp-graph method on such a gene-to-sample ratio has a decisive
+	impact on the functional coherence of the reverse-engineered transcriptional
+	regulatory modules and becomes crucial in such a challenging situation
+	in order to enable the discovery of a network of reasonable confidence
+	that includes a substantial number of genes relevant to the essayed
+	conditions. An R package, called qpgraph implementing this method
+	is part of the Bioconductor project and can be downloaded from (www.bioconductor.org).
+	A parallel standalone version for the most computationally expensive
+	calculations is available from (http://functionalgenomics.upf.xsedu/qpgraph).},
+  doi = {10.1089/cmb.2008.08TT},
+  institution = {Department of Experimental and Health Sciences, Universitat Pompeu
+	Fabra, Barcelona, Spain. robert.castelo@upf.edu},
+  keywords = {Algorithms; Computational Biology; Computer Simulation; Escherichia
+	coli; Gene Regulatory Networks; Metabolic Networks and Pathways;
+	Models, Biological; Oligonucleotide Array Sequence Analysis; Software},
+  owner = {frohlich},
+  pii = {10.1089/cmb.2008.08TT},
+  pmid = {19178140},
+  timestamp = {2011.09.23},
+  url = {http://dx.doi.org/10.1089/cmb.2008.08TT}
+}
+
+@ARTICLE{Covert2004,
+  author = {Markus W Covert and Eric M Knight and Jennifer L Reed and Markus
+	J Herrgard and Bernhard O Palsson},
+  title = {Integrating high-throughput and computational data elucidates bacterial
+	networks.},
+  journal = {Nature},
+  year = {2004},
+  volume = {429},
+  pages = {92--96},
+  number = {6987},
+  month = {May},
+  abstract = {The flood of high-throughput biological data has led to the expectation
+	that computational (or in silico) models can be used to direct biological
+	discovery, enabling biologists to reconcile heterogeneous data types,
+	find inconsistencies and systematically generate hypotheses. Such
+	a process is fundamentally iterative, where each iteration involves
+	making model predictions, obtaining experimental data, reconciling
+	the predicted outcomes with experimental ones, and using discrepancies
+	to update the in silico model. Here we have reconstructed, on the
+	basis of information derived from literature and databases, the first
+	integrated genome-scale computational model of a transcriptional
+	regulatory and metabolic network. The model accounts for 1,010 genes
+	in Escherichia coli, including 104 regulatory genes whose products
+	together with other stimuli regulate the expression of 479 of the
+	906 genes in the reconstructed metabolic network. This model is able
+	not only to predict the outcomes of high-throughput growth phenotyping
+	and gene expression experiments, but also to indicate knowledge gaps
+	and identify previously unknown components and interactions in the
+	regulatory and metabolic networks. We find that a systems biology
+	approach that combines genome-scale experimentation and computation
+	can systematically generate hypotheses on the basis of disparate
+	data sources.},
+  doi = {10.1038/nature02456},
+  institution = {Bioengineering Department, University of California, San Diego, 9500
+	Gilman Drive, La Jolla, California 92093-0412, USA.},
+  keywords = {Aerobiosis; Anaerobiosis; Computational Biology; Computer Simulation;
+	Escherichia coli; Gene Expression Profiling; Genes, Bacterial; Models,
+	Biological; Phenotype},
+  owner = {frohlich},
+  pii = {nature02456},
+  pmid = {15129285},
+  timestamp = {2011.09.21},
+  url = {http://dx.doi.org/10.1038/nature02456}
+}
+
+@ARTICLE{GriffithsJones2008,
+  author = {Griffiths-Jones, Sam and Saini, Harpreet Kaur and van Dongen, Stijn
+	and Enright, Anton J},
+  title = {{miRBase: tools for microRNA genomics.}},
+  journal = {Nucleic Acids Res},
+  year = {2008},
+  volume = {36},
+  pages = {D154----D158},
+  number = {Database issue},
+  month = jan,
+  abstract = {miRBase is the central online repository for microRNA (miRNA) nomenclature,
+	sequence data, annotation and target prediction. The current release
+	(10.0) contains 5071 miRNA loci from 58 species, expressing 5922
+	distinct mature miRNA sequences: a growth of over 2000 sequences
+	in the past 2 years. miRBase provides a range of data to facilitate
+	studies of miRNA genomics: all miRNAs are mapped to their genomic
+	coordinates. Clusters of miRNA sequences in the genome are highlighted,
+	and can be defined and retrieved with any inter-miRNA distance. The
+	overlap of miRNA sequences with annotated transcripts, both protein-
+	and non-coding, are described. Finally, graphical views of the locations
+	of a wide range of genomic features in model organisms allow for
+	the first time the prediction of the likely boundaries of many miRNA
+	primary transcripts. miRBase is available at http://microrna.sanger.ac.uk/.},
+  doi = {10.1093/nar/gkm952},
+  institution = {Faculty of Life Sciences, University of Manchester, Michael Smith
+	Building, Oxford Road, Manchester, UK. sam.griffiths-jones@manchester.ac.uk},
+  keywords = { Messenger; Software; Terminology as Topic, Nucleic Acid; Gene Silencing;
+	Genomics; Humans; I,Animals; Databases},
+  pmid = {17991681},
+  url = {http://dx.doi.org/10.1093/nar/gkm952}
+}
+
+@ARTICLE{Papadopoulos2009,
+  author = {Giorgos L Papadopoulos and Martin Reczko and Victor A Simossis and
+	Praveen Sethupathy and Artemis G Hatzigeorgiou},
+  title = {The database of experimentally supported targets: a functional update
+	of TarBase.},
+  journal = {Nucleic Acids Res},
+  year = {2009},
+  volume = {37},
+  pages = {D155--D158},
+  number = {Database issue},
+  month = {Jan},
+  abstract = {TarBase5.0 is a database which houses a manually curated collection
+	of experimentally supported microRNA (miRNA) targets in several animal
+	species of central scientific interest, plants and viruses. MiRNAs
+	are small non-coding RNA molecules that exhibit an inhibitory effect
+	on gene expression, interfering with the stability and translational
+	efficiency of the targeted mature messenger RNAs. Even though several
+	computational programs exist to predict miRNA targets, there is a
+	need for a comprehensive collection and description of miRNA targets
+	with experimental support. Here we introduce a substantially extended
+	version of this resource. The current version includes more than
+	1300 experimentally supported targets. Each target site is described
+	by the miRNA that binds it, the gene in which it occurs, the nature
+	of the experiments that were conducted to test it, the sufficiency
+	of the site to induce translational repression and/or cleavage, and
+	the paper from which all these data were extracted. Additionally,
+	the database is functionally linked to several other relevant and
+	useful databases such as Ensembl, Hugo, UCSC and SwissProt. The TarBase5.0
+	database can be queried or downloaded from http://microrna.gr/tarbase.},
+  doi = {10.1093/nar/gkn809},
+  institution = {Institute of Molecular Oncology, Biomedical Sciences Research Center
+	Alexander Fleming, 166 72 Varkiza, Synaptic Ltd, 711 10 Heraklion,
+	Greece. gipapado@fleming.gr},
+  keywords = {Animals; Databases, Nucleic Acid; Gene Expression Regulation; MicroRNAs;
+	RNA, Messenger},
+  owner = {frohlich},
+  pii = {gkn809},
+  pmid = {18957447},
+  timestamp = {2011.08.30},
+  url = {http://dx.doi.org/10.1093/nar/gkn809}
+}
+
+@ARTICLE{Ravasi2010,
+  author = {Timothy Ravasi and Harukazu Suzuki and Carlo Vittorio Cannistraci
+	and Shintaro Katayama and Vladimir B Bajic and Kai Tan and Altuna
+	Akalin and Sebastian Schmeier and Mutsumi Kanamori-Katayama and Nicolas
+	Bertin and Piero Carninci and Carsten O Daub and Alistair R R Forrest
+	and Julian Gough and Sean Grimmond and Jung-Hoon Han and Takehiro
+	Hashimoto and Winston Hide and Oliver Hofmann and Atanas Kamburov
+	and Mandeep Kaur and Hideya Kawaji and Atsutaka Kubosaki and Timo
+	Lassmann and Erik van Nimwegen and Cameron Ross MacPherson and Chihiro
+	Ogawa and Aleksandar Radovanovic and Ariel Schwartz and Rohan D Teasdale
+	and Jesper Tegn?r and Boris Lenhard and Sarah A Teichmann and Takahiro
+	Arakawa and Noriko Ninomiya and Kayoko Murakami and Michihira Tagami
+	and Shiro Fukuda and Kengo Imamura and Chikatoshi Kai and Ryoko Ishihara
+	and Yayoi Kitazume and Jun Kawai and David A Hume and Trey Ideker
+	and Yoshihide Hayashizaki},
+  title = {An atlas of combinatorial transcriptional regulation in mouse and
+	man.},
+  journal = {Cell},
+  year = {2010},
+  volume = {140},
+  pages = {744--752},
+  number = {5},
+  month = {Mar},
+  abstract = {Combinatorial interactions among transcription factors are critical
+	to directing tissue-specific gene expression. To build a global atlas
+	of these combinations, we have screened for physical interactions
+	among the majority of human and mouse DNA-binding transcription factors
+	(TFs). The complete networks contain 762 human and 877 mouse interactions.
+	Analysis of the networks reveals that highly connected TFs are broadly
+	expressed across tissues, and that roughly half of the measured interactions
+	are conserved between mouse and human. The data highlight the importance
+	of TF combinations for determining cell fate, and they lead to the
+	identification of a SMAD3/FLI1 complex expressed during development
+	of immunity. The availability of large TF combinatorial networks
+	in both human and mouse will provide many opportunities to study
+	gene regulation, tissue differentiation, and mammalian evolution.},
+  doi = {10.1016/j.cell.2010.01.044},
+  institution = {The FANTOM Consortium, University of California, San Diego, 9500
+	Gilman Drive, La Jolla, CA 92093, USA.},
+  keywords = {Animals; Cell Differentiation; Evolution, Molecular; Gene Expression
+	Regulation; Gene Regulatory Networks; Humans; Mice; Monocytes, cytology;
+	Organ Specificity; Smad3 Protein, metabolism; Trans-Activators, metabolism;
+	Transcription Factors, metabolism},
+  language = {eng},
+  medline-pst = {ppublish},
+  owner = {frohlich},
+  pii = {S0092-8674(10)00079-6},
+  pmid = {20211142},
+  timestamp = {2013.02.26},
+  url = {http://dx.doi.org/10.1016/j.cell.2010.01.044}
+}
+
+@ARTICLE{Roider2007TRAP,
+  author = {Helge G Roider and Aditi Kanhere and Thomas Manke and Martin Vingron},
+  title = {Predicting transcription factor affinities to DNA from a biophysical
+	model.},
+  journal = {Bioinformatics},
+  year = {2007},
+  volume = {23},
+  pages = {134--141},
+  number = {2},
+  month = {Jan},
+  abstract = {Theoretical efforts to understand the regulation of gene expression
+	are traditionally centered around the identification of transcription
+	factor binding sites at specific DNA positions. More recently these
+	efforts have been supplemented by experimental data for relative
+	binding affinities of proteins to longer intergenic sequences. The
+	question arises to what extent these two approaches converge. In
+	this paper, we adopt a physical binding model to predict the relative
+	binding affinity of a transcription factor for a given sequence.We
+	find that a significant fraction of genome-wide binding data in yeast
+	can be accounted for by simple count matrices and a physical model
+	with only two parameters. We demonstrate that our approach is both
+	conceptually and practically more powerful than traditional methods,
+	which require selection of a cutoff. Our analysis yields biologically
+	meaningful parameters, suitable for predicting relative binding affinities
+	in the absence of experimental binding data.The C source code for
+	our TRAP program is freely available for non-commercial use at http://www.molgen.mpg.de/~manke/papers/TFaffinities/},
+  doi = {10.1093/bioinformatics/btl565},
+  institution = {Max-Planck-Institute for Molecular Genetics Ihnestrasse 73, 14195
+	Berlin, Germany.},
+  keywords = {Algorithms; Binding Sites; Biophysics; Computer Simulation; DNA; Models,
+	Biological; Models, Chemical; Protein Binding; Sequence Analysis,
+	DNA; Transcription Factors; Transcription, Genetic},
+  owner = {frohlich},
+  pii = {btl565},
+  pmid = {17098775},
+  timestamp = {2011.05.16},
+  url = {http://dx.doi.org/10.1093/bioinformatics/btl565}
+}
+
+@ARTICLE{Smyth2004,
+  author = {Smyth, Gordon K},
+  title = {{Limma : Linear Models for Microarray Data}},
+  journal = {Bioinformatics},
+  pages = {397--420},
+  number = {2005},
+  file = {:home/abidata/articles/microarrays/Smyth2005Bioinformatics.pdf:pdf}
+}
+
+@ARTICLE{Wang2010,
+  author = {Juan Wang and Ming Lu and Chengxiang Qiu and Qinghua Cui},
+  title = {TransmiR: a transcription factor-microRNA regulation database.},
+  journal = {Nucleic Acids Res},
+  year = {2010},
+  volume = {38},
+  pages = {D119--D122},
+  number = {Database issue},
+  month = {Jan},
+  __markedentry = {[frohlich]},
+  abstract = {MicroRNAs (miRNAs) regulate gene expression at the posttranscriptional
+	level and are therefore important cellular components. As is true
+	for protein-coding genes, the transcription of miRNAs is regulated
+	by transcription factors (TFs), an important class of gene regulators
+	that act at the transcriptional level. The correct regulation of
+	miRNAs by TFs is critical, and increasing evidence indicates that
+	aberrant regulation of miRNAs by TFs can cause phenotypic variations
+	and diseases. Therefore, a TF-miRNA regulation database would be
+	helpful for understanding the mechanisms by which TFs regulate miRNAs
+	and understanding their contribution to diseases. In this study,
+	we manually surveyed approximately 5000 reports in the literature
+	and identified 243 TF-miRNA regulatory relationships, which were
+	supported experimentally from 86 publications. We used these data
+	to build a TF-miRNA regulatory database (TransmiR, http://cmbi.bjmu.edu.cn/transmir),
+	which contains 82 TFs and 100 miRNAs with 243 regulatory pairs between
+	TFs and miRNAs. In addition, we included references to the published
+	literature (PubMed ID) information about the organism in which the
+	relationship was found, whether the TFs and miRNAs are involved with
+	tumors, miRNA function annotation and miRNA-associated disease annotation.
+	TransmiR provides a user-friendly interface by which interested parties
+	can easily retrieve TF-miRNA regulatory pairs by searching for either
+	a miRNA or a TF.},
+  doi = {10.1093/nar/gkp803},
+  institution = {Department of Biomedical Informatics, Peking University School of
+	Basic Medical Sciences and MOE Key Laboratory of Molecular Cardiology,
+	Peking University, Beijing 100191, China.},
+  keywords = {Algorithms; Animals; Computational Biology, methods/trends; Databases,
+	Genetic; Databases, Nucleic Acid; Databases, Protein; Gene Regulatory
+	Networks; Humans; Information Storage and Retrieval, methods; Internet;
+	MicroRNAs, genetics/metabolism; Phenotype; PubMed; Software; Transcription
+	Factors, chemistry/genetics},
+  language = {eng},
+  medline-pst = {ppublish},
+  owner = {frohlich},
+  pii = {gkp803},
+  pmid = {19786497},
+  timestamp = {2013.02.26},
+  url = {http://dx.doi.org/10.1093/nar/gkp803}
+}
+
+@ARTICLE{Wang2008,
+  author = {Xiaowei Wang and Issam M El Naqa},
+  title = {Prediction of both conserved and nonconserved microRNA targets in
+	animals.},
+  journal = {Bioinformatics},
+  year = {2008},
+  volume = {24},
+  pages = {325--332},
+  number = {3},
+  month = {Feb},
+  abstract = {MicroRNAs (miRNAs) are involved in many diverse biological processes
+	and they may potentially regulate the functions of thousands of genes.
+	However, one major issue in miRNA studies is the lack of bioinformatics
+	programs to accurately predict miRNA targets. Animal miRNAs have
+	limited sequence complementarity to their gene targets, which makes
+	it challenging to build target prediction models with high specificity.Here
+	we present a new miRNA target prediction program based on support
+	vector machines (SVMs) and a large microarray training dataset. By
+	systematically analyzing public microarray data, we have identified
+	statistically significant features that are important to target downregulation.
+	Heterogeneous prediction features have been non-linearly integrated
+	in an SVM machine learning framework for the training of our target
+	prediction model, MirTarget2. About half of the predicted miRNA target
+	sites in human are not conserved in other organisms. Our prediction
+	algorithm has been validated with independent experimental data for
+	its improved performance on predicting a large number of miRNA down-regulated
+	gene targets.All the predicted targets were imported into an online
+	database miRDB, which is freely accessible at http://mirdb.org.},
+  doi = {10.1093/bioinformatics/btm595},
+  institution = {Department of Radiation Oncology, Washington University School of
+	Medicine, St. Louis, MO 63110, USA. xwang@radonc.wustl.edu},
+  keywords = {Animals; Artificial Intelligence; Conserved Sequence; Evolution, Molecular;
+	Gene Targeting; Humans; MicroRNAs; Oligonucleotide Array Sequence
+	Analysis; Pattern Recognition, Automated; Sequence Alignment; Sequence
+	Analysis, RNA; Species Specificity},
+  owner = {frohlich},
+  pii = {btm595},
+  pmid = {18048393},
+  timestamp = {2011.08.30},
+  url = {http://dx.doi.org/10.1093/bioinformatics/btm595}
+}
+
+@ARTICLE{Wu2011,
+  author = {Ming Wu and Christina Chan},
+  title = {Learning transcriptional regulation on a genome scale: a theoretical
+	analysis based on gene expression data.},
+  journal = {Brief Bioinform},
+  year = {2011},
+  month = {May},
+  abstract = {The recent advent of high-throughput microarray data has enabled the
+	global analysis of the transcriptome, driving the development and
+	application of computational approaches to study transcriptional
+	regulation on the genome scale, by reconstructing in silico the regulatory
+	interactions of the gene network. Although there are many in-depth
+	reviews of such 'reverse-engineering' methodologies, most have focused
+	on the practical aspect of data mining, and few on the biological
+	problem and the biological relevance of the methodology. Therefore,
+	in this review, from a biological perspective, we used a set of yeast
+	microarray data as a working example, to evaluate the fundamental
+	assumptions implicit in associating transcription factor (TF)-target
+	gene expression levels and estimating TFs' activity, and further
+	explore cooperative models. Finally we confirm that the detailed
+	transcription mechanism is overly-complex for expression data alone
+	to reveal, nevertheless, future network reconstruction studies could
+	benefit from the incorporation of context-specific information, the
+	modeling of multiple layers of regulation (e.g. micro-RNA), or the
+	development of approaches for context-dependent analysis, to uncover
+	the mechanisms of gene regulation.},
+  doi = {10.1093/bib/bbr029},
+  owner = {frohlich},
+  pii = {bbr029},
+  pmid = {21622543},
+  timestamp = {2011.08.30},
+  url = {http://dx.doi.org/10.1093/bib/bbr029}
+}
+
+@ARTICLE{Zacher2012,
+  author = {Benedikt Zacher and Khalid Abnaof and Stephan Gade and Erfan Younesi
+	and Achim Tresch and Holger Fr\"ohlich},
+  title = {Joint Bayesian inference of condition-specific miRNA and transcription
+	factor activities from combined gene and microRNA expression data.},
+  journal = {Bioinformatics},
+  year = {2012},
+  volume = {28},
+  pages = {1714--1720},
+  number = {13},
+  month = {Jul},
+  abstract = {MOTIVATION: There have been many successful experimental and bioinformatics
+	efforts to elucidate transcription factor (TF)-target networks in
+	several organisms. For many organisms, these annotations are complemented
+	by miRNA-target networks of good quality. Attempts that use these
+	networks in combination with gene expression data to draw conclusions
+	on TF or miRNA activity are, however, still relatively sparse. RESULTS:
+	In this study, we propose Bayesian inference of regulation of transcriptional
+	activity (BIRTA) as a novel approach to infer both, TF and miRNA
+	activities, from combined miRNA and mRNA expression data in a condition
+	specific way. That means our model explains mRNA and miRNA expression
+	for a specific experimental condition by the activities of certain
+	miRNAs and TFs, hence allowing for differentiating between switches
+	from active to inactive (negative switch) and inactive to active
+	(positive switch) forms. Extensive simulations of our model reveal
+	its good prediction performance in comparison to other approaches.
+	Furthermore, the utility of BIRTA is demonstrated at the example
+	of Escherichia coli data comparing aerobic and anaerobic growth conditions,
+	and by human expression data from pancreas and ovarian cancer. Availability
+	and implementation: The method is implemented in the R package birta,
+	which is freely available for Bio-conductor (>=2.10) on http://www.bioconductor.org/packages/release/bioc/html/birta.html.},
+  doi = {10.1093/bioinformatics/bts257},
+  institution = {Ludwig-Maximilians-Universit?t M?nchen, Gene Center Munich and Center
+	for integrated Protein Science CiPSM, Department of Chemistry and
+	Biochemistry, Feodor-Lynen-Street 25, 81377 Munich, Germany.},
+  language = {eng},
+  medline-pst = {ppublish},
+  owner = {frohlich},
+  pii = {bts257},
+  pmid = {22563068},
+  timestamp = {2013.02.26},
+  url = {http://dx.doi.org/10.1093/bioinformatics/bts257}
+}
+
