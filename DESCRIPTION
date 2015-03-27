@@ -1,6 +1,6 @@
 Package: birte
-Version: 0.99.1
-Date: 2015-01-27
+Version: 1.0.0
+Date: 2015-03-27
 Title: Bayesian Inference of Regulatory Influence on Expression (biRte)
 Author: Holger Froehlich, contributions by Benedikt Zacher
 Maintainer: Holger Froehlich <frohlich@bit.uni-bonn.de>

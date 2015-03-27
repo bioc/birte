@@ -40,6 +40,7 @@ During MCMC, switch moves - toggling the state of a regulator between active and
 \item significantly faster inference (about 15 fold speed-up)
 \item significantly higher accuracy of inference due to improved likelihood calculation
 \item inference of regulatory networks as a follow-up step
+\item possibility to work with arbitrarily complex statistical designs, if log fold changes are used.
 \end{itemize}
 
 The package can be loaded by typing:
@@ -114,8 +115,8 @@ activeTFs
 
 <<ecoli DE genes, echo=TRUE>>=
 if(length(activeTFs) > 0){
-	DEgenes = rownames(limmamRNA$pvalue.tab)[limmamRNA$pvalue.tab$adj.P.Val < 0.05]
-	genesetsTF = sapply(affinities$TF, names)
+	DEgenes = rownames(limmamRNA$pvalue.tab)[limmamRNA$pvalue.tab$adj.P.Val < 0.05 & abs(limmamRNA$pvalue.tab$logFC > 1)]
+	genesetsTF = c(sapply(affinities$TF, names), sapply(affinities$other, names))
 	DEgenesInTargets = sapply(genesetsTF[intersect(activeTFs, names(genesetsTF))], 
 	function(x) c(length(which(x %in% DEgenes)), length(x)))
 	rownames(DEgenesInTargets) = c("#DEgenes", "#targets")
@@ -148,7 +149,7 @@ limmaTF = limmamRNA
 limmaTF$pvalue.tab = limmaTF$pvalue.tab[rownames(limmaTF$pvalue.tab) %in% fData(TFexpr)$Entrez, ]
 names(limmaTF$lm.fit$sigma) = as.character(fData(EColiOxygen)$symbol[match(names(limmaTF$lm.fit$sigma), fData(EColiOxygen)$Entrez)])
 rownames(limmaTF$pvalue.tab) = as.character(fData(EColiOxygen)$symbol[match(rownames(limmaTF$pvalue.tab), fData(EColiOxygen)$Entrez)])
-diff.TF = rownames(limmaTF$pvalue.tab)[limmaTF$pvalue.tab$adj.P.Val < 0.05]
+diff.TF = rownames(limmaTF$pvalue.tab)[limmaTF$pvalue.tab$adj.P.Val < 0.05 & abs(limmaTF$pvalue.tab$logFC) > 1]
 theta.TF = rep(1/length(affinities$TF), length(affinities$TF))
 names(theta.TF) = names(affinities$TF)
 theta.other = rep(1/length(affinities$other), length(affinities$other))

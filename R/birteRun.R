@@ -2,22 +2,30 @@
 # Author: Holger Fröhlich
 ###############################################################################
 
-birte.limma.aux = function(limmamiRNA, dat.miRNA, lfc, fdr){
+birte.limma.aux = function(limmamiRNA, dat.miRNA, lfc, fdr, explain.LFC=TRUE){
 	if(!is.null(limmamiRNA) && !is.null(dat.miRNA)){
 		cat("Automatic assignement of #replicates with design matrix.\n")
-		stopifnot(!is.null(limmamiRNA$design))
-		stopifnot(NCOL(limmamiRNA$design) == 2)
-		groups = lapply(1:NCOL(limmamiRNA$design), function(i) which(limmamiRNA$design[,i] == 1))		
-		dat.miRNA = dat.miRNA[,as.vector(unlist(groups))]
-		nrep.miRNA = sapply(groups, length)				
+		stopifnot(!is.null(limmamiRNA$design))	
+		if(is.null(limmamiRNA$pvalue.tab$ID))
+		  limmamiRNA$pvalue.tab$ID = rownames(limmamiRNA$pvalue.tab)
+    if(!explain.LFC){
+      stopifnot(NCOL(limmamiRNA$design) == 2)
+		  groups = lapply(1:NCOL(limmamiRNA$design), function(i) which(limmamiRNA$design[,i] == 1))		
+		  dat.miRNA[,as.vector(unlist(groups))]
+		  nrep.miRNA = sapply(groups, length)		
+    }    		 
+    else{
+      dat.miRNA = as.matrix(limmamiRNA$pvalue.tab$logFC)
+      rownames(dat.miRNA) = limmamiRNA$pvalue.tab$ID
+      nrep.miRNA = c(1,1)
+    }
 		stopifnot(!is.null(dat.miRNA))
 		if(is.null(lfc))
 			lfc = 0
 		if(is.null(fdr))
-			fdr = 0.05
-    if(is.null(limmamiRNA$pvalue.tab$ID))
-		  limmamiRNA$pvalue.tab$ID = rownames(limmamiRNA$pvalue.tab)
+			fdr = 0.05   
 		diff.miRNA = as.character(limmamiRNA$pvalue.tab$ID[abs(limmamiRNA$pvalue.tab$logFC) > lfc & limmamiRNA$pvalue.tab$adj.P.Val < fdr])
+    
 		A_Sigma = limmamiRNA$lm.fit$sigma[rownames(dat.miRNA)]    
 	}
 	else{
@@ -37,10 +45,19 @@ birteLimma = function(dat.mRNA, limmamRNA,
     stop("Please provide argument limmamRNA!")
   cat("Automatic assignement of #replicates with design matrix (mRNA data).\n")
   stopifnot(!is.null(limmamRNA$design))
-  
-  groups = lapply(1:NCOL(limmamRNA$design), function(i) which(limmamRNA$design[,i] == 1))  
-  dat.mRNA = dat.mRNA[,as.vector(unlist(groups))]
-  nrep.mRNA = sapply(groups, length)	
+  if(is.null(limmamRNA$pvalue.tab$ID))
+    limmamRNA$pvalue.tab$ID = rownames(limmamRNA$pvalue.tab)
+  if(!explain.LFC){
+    stopifnot(NCOL(limmamRNA$design) == 2)
+    groups = lapply(1:NCOL(limmamRNA$design), function(i) which(limmamRNA$design[,i] == 1))  
+    dat.mRNA = dat.mRNA[,as.vector(unlist(groups))]
+    nrep.mRNA = sapply(groups, length)	
+  }
+  else{
+    dat.mRNA = as.matrix(limmamRNA$pvalue.tab$logFC)
+    rownames(dat.mRNA) = limmamRNA$pvalue.tab$ID
+    nrep.mRNA = c(1,1)
+  }
   stopifnot(!is.null(dat.mRNA))		
   O_Sigma = limmamRNA$lm.fit$sigma[rownames(dat.mRNA)]	
   df.mRNA = limmamRNA$lm.fit$df.residual
@@ -50,7 +67,7 @@ birteLimma = function(dat.mRNA, limmamRNA,
   for(regulator.type in names(limma.regulators)){
     cat(regulator.type, "==> ")
     if(!is.null(limma.regulators[[regulator.type]])){
-      res = birte.limma.aux(limma.regulators[[regulator.type]], data.regulators[[regulator.type]], lfc.regulators[[regulator.type]], fdr.regulators[[regulator.type]])
+      res = birte.limma.aux(limma.regulators[[regulator.type]], data.regulators[[regulator.type]], lfc.regulators[[regulator.type]], fdr.regulators[[regulator.type]], explain.LFC=explain.LFC)
     }
     else
       res = NULL
@@ -102,7 +119,7 @@ birteRun = function(dat.mRNA, mRNA.Sigma=NULL, nrep.mRNA=c(5, 5), df.mRNA=sum(nr
     cat("--> biRte tries to explain mRNA log fold changes\n")
   else
     cat("--> biRte tries to explain condition specific mRNA expression\n")
-  if(is.null(mRNA.Sigma)){
+  if(is.null(mRNA.Sigma) && all(nrep.mRNA > 1) && NCOL(dat.mRNA) > 1){
     warning("No SDs for mRNA data provided --> trying to automatically build limma model and deduce standard deviations ...")
     colnames(dat.mRNA) = c(rep("condition1", nrep.mRNA[1]), rep("condition2", nrep.mRNA[2]))    
     limma.mRNA = limmaAnalysis(dat.mRNA, contrast="condition1 - condition2")
@@ -115,15 +132,15 @@ birteRun = function(dat.mRNA, mRNA.Sigma=NULL, nrep.mRNA=c(5, 5), df.mRNA=sum(nr
     }      
   }
   if(length(df.mRNA) == 1){
-    df.mRNA = rep(df.mRNA, NROW(dat.mRNA))
-    names(df.mRNA) = rownames(dat.mRNA)
+    df.mRNA = rep(df.mRNA, NROW(dat.mRNA))    
+    names(df.mRNA) = rownames(dat.mRNA)    
   }
 	for(regulator.type in names(affinities)){		
     cat(regulator.type, "\n")    
 		myaffinities = affinities[[regulator.type]]		
 		res = birte.aux(model=model, regulator.type=regulator.type, C_cnt=C_cnt, nrep.mRNA=nrep.mRNA, dat.mRNA=dat.mRNA, dat.miRNA=data.regulators[[regulator.type]], 
 				miRNA.data.type="array", miRNA.Sigma=sigma.regulators[[regulator.type]], nrep.miRNA=nrep.regulators[[regulator.type]], diff.miRNA=diff.regulators[[regulator.type]], 
-				init_miR=init.regulators[[regulator.type]], theta_miRNA=theta.regulators[[regulator.type]], affinitiesmiRNA=myaffinities, use.affinities=use.affinities, only.switches=only_switches, potential_swaps=potential_swaps, only.diff.TFs=only.diff.TFs)
+				init_miR=init.regulators[[regulator.type]], theta_miRNA=theta.regulators[[regulator.type]], affinitiesmiRNA=myaffinities, use.affinities=use.affinities, only.switches=only_switches, potential_swaps=potential_swaps, only.diff.TFs=only.diff.TFs, explain.LFC=explain.LFC)
 		data.regulators2[[regulator.type]] = res$dat		
 		alpha0[[regulator.type]] = res$alpha0
 		alpha[[regulator.type]] = res$alpha
@@ -148,8 +165,8 @@ birteRun = function(dat.mRNA, mRNA.Sigma=NULL, nrep.mRNA=c(5, 5), df.mRNA=sum(nr
       alpha0[[regulator.type]] = res$alpha0*0      
 		}
 		#		
-		alltargets = union(alltargets, unlist(genesets[regulator.type]))
-		ctrl = setdiff(unlist(genesets[[regulator.type]]), rownames(dat.mRNA))
+		alltargets = union(alltargets, unlist(genesets[regulator.type]))    
+		ctrl = setdiff(unlist(genesets[[regulator.type]]), rownames(dat.mRNA))    
 		if(length(ctrl) > 0)
 			stop(paste("Problem: Incompatibilities between network and annnotation of", regulator.type, "data (not the same target genes)"))
 		all.regulators = union(all.regulators, colnames(init.regulators2[[regulator.type]]))
@@ -181,22 +198,27 @@ birteRun = function(dat.mRNA, mRNA.Sigma=NULL, nrep.mRNA=c(5, 5), df.mRNA=sum(nr
     }			
     interactions = t(sapply(com, function(x) c(which(rownames(K) == x[1]), which(rownames(K) == x[2])))) - 1        	    
   }    
-  #
-	dat.mRNA = dat.mRNA[alltargets,]		  
+  #  
+	dat.mRNA = dat.mRNA[alltargets,,drop=FALSE]		    
 	mRNA.Sigma = mRNA.Sigma[alltargets]
   df.mRNA = df.mRNA[alltargets]
 	if(any(is.na(mRNA.Sigma)))
 		stop("Variance of mRNA expressions must not equal NA!")
 	stopifnot(rownames(dat.mRNA) == rownames(mRNA.Sigma))	
-  mu = cbind(apply(dat.mRNA[,1:nrep.mRNA[1]], 1, mean), apply(dat.mRNA[,(nrep.mRNA[1] + 1):NCOL(dat.mRNA)], 1, mean))
-  rownames(mu) = rownames(dat.mRNA)		
+  
   dat.mRNA.orig = dat.mRNA  
   est = suppressWarnings(fitdistr(1/mRNA.Sigma^2, "gamma"))
 	alpha.mRNA = est$estimate[1]
 	beta.mRNA = est$estimate[2]    
 	var.post = (2*beta.mRNA + df.mRNA*mRNA.Sigma^2) / (2*alpha.mRNA + df.mRNA) # limma estimate of posterior mean
-	if(explain.LFC){			  
-		logFC = mu[,2] - mu[,1]	    
+	if(explain.LFC){
+    if(all(nrep.mRNA == 1)) # log FCs provided
+      logFC = dat.mRNA
+    else{
+	    mu = cbind(apply(dat.mRNA[,1:nrep.mRNA[1]], 1, mean), apply(dat.mRNA[,(nrep.mRNA[1] + 1):NCOL(dat.mRNA)], 1, mean))
+	    rownames(mu) = rownames(dat.mRNA)  	
+		  logFC = mu[,2] - mu[,1]	    
+    }
 		dat.mRNA = logFC / var.post
 		nrep.mRNA = 1					    
 	}	
@@ -222,7 +244,7 @@ birteRun = function(dat.mRNA, mRNA.Sigma=NULL, nrep.mRNA=c(5, 5), df.mRNA=sum(nr
 }
 
 #  auxilliary function
-birte.aux = function(model="all-plug-in", regulator.type, C_cnt, dat.mRNA, nrep.mRNA, dat.miRNA, miRNA.data.type="array", miRNA.Sigma, nrep.miRNA, diff.miRNA, init_miR, theta_miRNA, affinitiesmiRNA, use.affinities, only.switches, potential_swaps, only.diff.TFs){			
+birte.aux = function(model="all-plug-in", regulator.type, C_cnt, dat.mRNA, nrep.mRNA, dat.miRNA, miRNA.data.type="array", miRNA.Sigma, nrep.miRNA, diff.miRNA, init_miR, theta_miRNA, affinitiesmiRNA, use.affinities, only.switches, potential_swaps, only.diff.TFs, explain.LFC){			
 	alpha_i0 = alpha.miRNA = alpha.miR = beta.miR = miRNA.data.type = NULL	
 	if(length(affinitiesmiRNA) > 0 ) {
 	  affinitiesmiRNA = sapply(affinitiesmiRNA, function(s) s[intersect(names(s), rownames(dat.mRNA))])		    
@@ -262,8 +284,10 @@ birte.aux = function(model="all-plug-in", regulator.type, C_cnt, dat.mRNA, nrep.
 				affinitiesmiRNA = affinitiesmiRNA[miRNAInAnnotation]
 				init_miR = init_miR[,miRNAInAnnotation, drop=FALSE]
 			}          			
-			if(is.null(miRNA.Sigma)){
+			if(is.null(miRNA.Sigma)){        
 			  warning("No SDs for regulator type ", regulator.type, " provided --> trying to automatically build limma model and deduce standard deviations ...")
+        if(all(nrep.miRNA == 1))
+          stop("Cannot build limma model ==> #replicates = 1!")
 			  colnames(dat.miRNA) = c(rep("condition1", nrep.miRNA[1]), rep("condition2", nrep.miRNA[2]))    
 			  limma.miRNA = limmaAnalysis(dat.miRNA, contrast="condition2 - condition1")
 			  miRNA.Sigma = limma.miRNA$lm.fit$sigma
@@ -280,18 +304,23 @@ birte.aux = function(model="all-plug-in", regulator.type, C_cnt, dat.mRNA, nrep.
 				dat.miRNA = NULL				
 			}
 			else{				
-			  conditions = as.vector(unlist(sapply(1:length(nrep.miRNA), function(co) rep(paste("condition", co, sep=""), nrep.miRNA[co]))))  	
-				logFC = apply(dat.miRNA[, conditions == "condition2", drop=FALSE], 1, mean) - apply(dat.miRNA[, conditions == "condition1", drop=FALSE], 1, mean)				
+        if(all(nrep.miRNA == 1) && explain.LFC) # logFC data provided
+          logFC = dat.miRNA
+        else{
+			    conditions = as.vector(unlist(sapply(1:length(nrep.miRNA), function(co) rep(paste("condition", co, sep=""), nrep.miRNA[co]))))  	
+				  logFC = as.matrix(apply(dat.miRNA[, conditions == "condition2", drop=FALSE], 1, mean) - apply(dat.miRNA[, conditions == "condition1", drop=FALSE], 1, mean))
+          rownames(logFC) = rownames(dat.miRNA)
+        }        
 				est = suppressWarnings(fitdistr(1/miRNA.Sigma^2, "gamma")$estimate)
 				alpha.miR = est[1]
 				beta.miR = est[2]
-				which.up = names(logFC)[logFC > 0]
-				which.down = names(logFC)[logFC < 0]				
+				which.up = rownames(logFC)[logFC > 0]
+				which.down = rownames(logFC)[logFC < 0]				
 				if(length(diff.miRNA) > 0){
 					stopifnot(class(diff.miRNA) == "character")		
 					diff.miRNA = intersect(diff.miRNA, rownames(dat.miRNA))
-					diff.miRNA.up = intersect(names(logFC)[logFC > 0], diff.miRNA)
-					diff.miRNA.down = intersect(names(logFC)[logFC < 0], diff.miRNA)
+					diff.miRNA.up = intersect(rownames(logFC)[logFC > 0], diff.miRNA)
+					diff.miRNA.down = intersect(rownames(logFC)[logFC < 0], diff.miRNA)
 				}
 				else{
 					diff.miRNA.up = diff.miRNA.down = c()
@@ -300,18 +329,18 @@ birte.aux = function(model="all-plug-in", regulator.type, C_cnt, dat.mRNA, nrep.
 				names(alpha.miRNA) = rownames(dat.miRNA)
 				alpha.miRNA[which.down] = -1
 				if(length(diff.miRNA.up) > 0){																
-					logFC.up = apply(dat.miRNA[diff.miRNA.up, conditions == "condition2", drop=FALSE], 1, mean) - apply(dat.miRNA[diff.miRNA.up, conditions == "condition1", drop=FALSE], 1, mean)
+					logFC.up = drop(logFC[diff.miRNA.up,])
 					alpha.miRNA[which.up] = median(logFC.up, na.rm=TRUE)
 					alpha.miRNA[diff.miRNA.up] = logFC.up
 				}
 				if(length(diff.miRNA.down) > 0){																
-					logFC.down = apply(dat.miRNA[diff.miRNA.down, conditions == "condition2", drop=FALSE], 1, mean) - apply(dat.miRNA[diff.miRNA.down, conditions == "condition1", drop=FALSE], 1, mean)
+					logFC.down = drop(logFC[diff.miRNA.down,])
 					alpha.miRNA[which.down] = median(logFC.down, na.rm=TRUE)
 					alpha.miRNA[diff.miRNA.down] = logFC.down
 				}					
 				if(length(diff.miRNA.up) + length(diff.miRNA.down) > 0 && regulator.type == "TF" && only.diff.TFs){ # für TFs: nur differentielle werden berücksichtigt!
 					dat.miRNA = dat.miRNA[union(diff.miRNA.up, diff.miRNA.down),,drop=FALSE]
-          logFC = logFC[rownames(dat.miRNA)]					
+          logFC = logFC[rownames(dat.miRNA),,drop=FALSE]					
 					miRNA.Sigma = miRNA.Sigma[rownames(dat.miRNA)]
 					alpha.miRNA = alpha.miRNA[rownames(dat.miRNA)]
 					alpha_i0 = alpha_i0[rownames(dat.miRNA)]

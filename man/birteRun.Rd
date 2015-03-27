@@ -9,7 +9,7 @@ The function estimates regulator activities via MCMC sampling. The function assu
 
 Besides miRNA, mRNA and TF expression data, biRte also allows to integrate other data types (e.g. CNV data - data type 'other').
 
-birte.limma is a convenience function, which allows to directly pass results from a previous limma analysis (see \code{\link{limmaAnalysis}}) to birte.run. 
+birteLimma is a convenience function, which allows to directly pass results from a previous limma analysis (see \code{\link{limmaAnalysis}}) to birteRun. When working with relative expression levels (log fold changes) birteLimma allows to deal with arbitrary complex statistical designs, including e.g. time as a covariate.
 }
 \usage{
 birteRun(dat.mRNA, mRNA.Sigma=NULL, nrep.mRNA=c(5, 5), 
