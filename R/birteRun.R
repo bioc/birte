@@ -239,7 +239,8 @@ birteRun = function(dat.mRNA, mRNA.Sigma=NULL, nrep.mRNA=c(5, 5), df.mRNA=sum(nr
 			alpha_i0TF=alpha0$TF, alpha_iTF=alpha$TF, TF_sigma=sigma.regulators2$TF, alphaTF=alpha.para$TF, betaTF=beta.para$TF, alpha=alpha.mRNA, beta=beta.mRNA)	
 	#
   res$affinities = affinities.orig  	
-  res$explain.LFC = explain.LFC
+  res$explain.LFC = explain.LFC  
+  res$df.mRNA = df.mRNA
   res
 }
 
