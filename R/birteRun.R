@@ -223,8 +223,10 @@ birteRun = function(dat.mRNA, mRNA.Sigma=NULL, nrep.mRNA=c(5, 5), df.mRNA=sum(nr
 		nrep.mRNA = 1					    
 	}	
   else{
-    dat.mRNA = t(sapply(1:NROW(dat.mRNA), function(i) dat.mRNA[i,] / dat.mRNA[i,] / var.post[i]))
+    dat.mRNA = t(sapply(1:NROW(dat.mRNA), function(i) dat.mRNA[i,] / var.post[i]))
   }	
+  # post normalization:
+  beta.mRNA = alpha.mRNA # expectation=1 and variance = 1/alpha
 	res = birteStart(mRNAexpr=dat.mRNA, miRNAexpr=data.regulators2$miRNA, Qexpr=data.regulators2$other, nrep.mRNA=nrep.mRNA, nrep.miRNA=nrep.regulators$miRNA, nrep.TF=nrep.regulators$TF, nrep.Q=nrep.regulators$other,
 			mRNA.data.type="array", miRNA.data.type=regulators.data.type$miRNA, Qexpr.data.type=regulators.data.type$other,
 			genesetsTF=genesets$TF, genesetsmiRNA=genesets$miRNA, genesetsothers=genesets$other,

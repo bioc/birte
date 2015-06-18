@@ -1,0 +1,14 @@
+     citHeader("To cite package 'birte' in publications use:")
+     
+     desc <- packageDescription("birte")
+     year <- sub(".*(2[[:digit:]]{3})-.*", "\\1", desc$Date)
+     vers <- paste("R package version", desc$Version)
+     
+     citEntry(entry="article",
+              title = "biRte: Bayesian Inference of Context Specific Regulator Activities and Transcriptional Networks",
+              author = personList(as.person("Holger Froehlich")),
+              journal="Bioinformatics",
+              number="",
+              pages="",                                  
+              year = "2015",              
+              textVersion = "Holger Froehlich (2015). biRte: Bayesian Inference of Context Specific Regulator Activities and Transcriptional Networks. Bioinformatics. in press")
