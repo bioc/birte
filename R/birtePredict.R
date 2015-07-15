@@ -1,4 +1,4 @@
-birtePredict = function(model, test.genes, method=c("Bayes", "MAP")){  
+birtePredict = function(model, test.genes, method=c("Bayes", "MAP"), knock.out=NULL){  
   method = match.arg(method)
   x.test = matrix(0, ncol=ncol(model$design), nrow=length(test.genes))
   dimnames(x.test) = list(test.genes, colnames(model$design))
@@ -6,7 +6,7 @@ birtePredict = function(model, test.genes, method=c("Bayes", "MAP")){
   types = c(rep("TF", length(model$affinities$TF)), rep("miRNA", length(model$affinities$miRNA)), rep("other", length(model$affinities$other)))
   names(types) = names(affinities)
   x.test[,1] = 1
-  for(i in setdiff(colnames(x.test), "intercept")){
+  for(i in setdiff(colnames(x.test), union("intercept", knock.out))){
     if(types[i] == "miRNA")
       x.test[intersect(test.genes, affinities[[i]]), i] = -1
     else
@@ -15,24 +15,24 @@ birtePredict = function(model, test.genes, method=c("Bayes", "MAP")){
   all.coef = c("intercept", rownames(model$post))
   pred = list()
   for(c in 1:model$C_cnt){    
-    pred[[c]] = list()
-    for(r in 1:NCOL(model$coef)){       
-      if(method == "Bayes"){
+    pred[[c]] = list()    
+    if(method == "Bayes"){
+      for(r in 1:NCOL(model$coef)){       
         predtmp = x.test[,all.coef] %*% (model$coef[c,r][[1]][all.coef,] * c(1, model$post[,c]))        
         pred[[c]][[r]] = data.frame(gene=test.genes, mean=apply(predtmp, 1, mean), sd=apply(predtmp, 1, sd)) 
       }
-      else if(method == "MAP"){
-        if(!is.null(model$fit.ridge)){
-          if(length(setdiff(names(coef(model$fit.ridge)), "(Intercept)")) > 0)
-            predtmp = predict(model$fit.ridge, x.test[, names(coef(model$fit.ridge))])
-          else
-            predtmp = predict(model$fit.ridge)
-          pred[[c]][[r]] = data.frame(gene=test.genes, mean=predtmp)      
-        }
+    }
+    else if(method == "MAP"){
+      if(!is.null(model$fit.ridge)){            
+        if(length(setdiff(names(coef(model$fit.ridge)), "(Intercept)")) > 0)
+          predtmp = predict(model$fit.ridge, data.frame(x.test[, intersect(colnames(x.test), names(coef(model$fit.ridge)))]))
         else
-          stop("No predictions possible: either use Bayesian prediction or fit ridge regression model first!")
-      }      
-    }    
+          predtmp = predict(model$fit.ridge)
+        pred[[c]] = data.frame(gene=test.genes, mean=predtmp)      
+      }
+      else
+        stop("No predictions possible: either use Bayesian prediction or fit ridge regression model first!")
+    }          
   }
   pred
 }
@@ -49,8 +49,8 @@ birteFitRidge = function(model, mRNA.train, ref.cond=1){
     affinities = c(sapply(model$affinities$TF, names), sapply(model$affinities$miRNA, names), sapply(model$affinities$other, names))  
     for(i in colnames(x.train)){
       x.train[intersect(names(mRNA.train), affinities[[i]]), i] = 1
-    } 
-    model$fit.ridge = linearRidge(mRNA.train ~ x.train)
+    }    
+    model$fit.ridge = linearRidge(mRNA.train ~ ., data=data.frame(x.train))
   }
   else{
     warning("MAP configuration is the empty model!")   

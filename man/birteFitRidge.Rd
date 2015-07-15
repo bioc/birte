@@ -4,7 +4,7 @@
 Fit ridge regression model given a defined set of active regulators.
 }
 \description{
-Given a most likely configuration of active regulators identified by biRte, this method fits a conventional ridge regression model to explain gene expression. This function is required, if one would like to use MAP based prediction of gene expression instead of Bayesian predictions (see \code{\link{birtePredict}}).To fit the ridge regression model the R-package \code{ridge} is employed, which provides an efficient tuning of the regularization hyperparameter. 
+Given a most likely configuration of active regulators identified by biRte, this method fits a conventional ridge regression model to explain gene expression. This function is required, if one would like to use MAP based prediction of gene expression instead of Bayesian predictions (see \code{\link{birtePredict}}). To fit the ridge regression model the R-package \code{ridge} is employed, which provides an efficient tuning of the regularization hyperparameter. 
 }
 \usage{
 birteFitRidge(model, mRNA.train, ref.cond=1)
@@ -16,6 +16,9 @@ birteFitRidge(model, mRNA.train, ref.cond=1)
 }
 \value{
 an object of class "ridgeLinear" (see \code{\link{linearRidge}})
+}
+\details{
+In order to make predictions with the fitted ridge regression model (\code{\link{birtePredict}}) store it into a slot "fit.ridge" of the object returned by \code{\link{birteRun}} and \code{\link{birteLimma}}, respectively.
 }
 \examples{
 # artificial data

@@ -7,12 +7,13 @@ Prediction of gene expression via biRte.
 Given a biRte model, this function makes posterior inference about gene expression data. 
 }
 \usage{
-birtePredict(model, test.genes, method=c("Bayes", "MAP"))
+birtePredict(model, test.genes, method=c("Bayes", "MAP"), knock.out=NULL)
 }
 \arguments{
 \item{model}{output of \code{\link{birteRun}}}
 \item{test.genes}{Set of gene IDs. Gene IDs should be contained into the defined regulator-target gene network. Note that  expression data is generally not required to be available for these genes.}
-\item{method}{Bayes: estimate expectation of posterior predictive distribution. MAP: Use previously fitted ridge regression model (\code{\link{birteFitRidge}}).}
+\item{method}{Bayes: estimate expectation of posterior predictive distribution. MAP: Use previously fitted ridge regression model (\code{\link{birteFitRidge}}), which has to be stored into a slot "fit.ridge".}
+\item{knock.out}{optionally: A character vector of those regulators, which should be removed from the network before making predictions, hence simulating a knock.out}
 }
 \value{
 #conditions x #replicates matrix containing data.frame objects with
