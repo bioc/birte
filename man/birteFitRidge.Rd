@@ -15,7 +15,7 @@ birteFitRidge(model, mRNA.train, ref.cond=1)
 \item{ref.cond}{condition to consider}
 }
 \value{
-an object of class "ridgeLinear" (see \code{\link{linearRidge}})
+an object of class "cv.glmnet" (see \code{\link{cv.glmnet}})
 }
 \details{
 In order to make predictions with the fitted ridge regression model (\code{\link{birtePredict}}) store it into a slot "fit.ridge" of the object returned by \code{\link{birteRun}} and \code{\link{birteLimma}}, respectively.

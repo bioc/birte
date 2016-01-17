@@ -1,7 +1,7 @@
 useDynLib(birte, .registration=TRUE)
 importFrom(limma, lmFit, makeContrasts, contrasts.fit, eBayes, topTable)
 importFrom(MASS, fitdistr, mvrnorm)
-import(ridge)
+import(glmnet)
 import(Rcpp)
 import(RcppArmadillo)
 import(Biobase)

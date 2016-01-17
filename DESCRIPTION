@@ -1,12 +1,12 @@
 Package: birte
 Version: 1.7.0
-Date: 2015-07-15
+Date: 2015-06-16
 Title: Bayesian Inference of Regulatory Influence on Expression (biRte)
 Author: Holger Froehlich, contributions by Benedikt Zacher
 Maintainer: Holger Froehlich <frohlich@bit.uni-bonn.de>
 Depends: R(>= 3.0.0), RcppArmadillo (>= 0.3.6.1), Rcpp
-Imports: MASS, limma(>= 3.22.0), ridge, Biobase, nem
-Reference: H. Froehlich, biRte: Bayesian Inference of Context Specific Regulator Activities and Transcriptional Networks, Bioinformatics, 2015, doi: 10.1093/bioinformatics/btv379.
+Imports: MASS, limma(>= 3.22.0), glmnet, Biobase, nem
+Reference: H. Froehlich, biRte: Bayesian Inference of Context Specific Regulator Activities and Transcriptional Networks, Bioinformatics, 2015, in press.
 Suggests: knitr
 Enhances: Rgraphviz
 LinkingTo: RcppArmadillo, Rcpp
