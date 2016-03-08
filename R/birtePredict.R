@@ -24,10 +24,7 @@ birtePredict = function(model, test.genes, method=c("Bayes", "MAP"), knock.out=N
     }
     else if(method == "MAP"){
       if(!is.null(model$fit.ridge)){            
-        if(length(setdiff(names(coef(model$fit.ridge)), "(Intercept)")) > 0)
-          predtmp = predict(model$fit.ridge, data.frame(x.test[, intersect(colnames(x.test), names(coef(model$fit.ridge)))]))
-        else
-          predtmp = predict(model$fit.ridge)
+          predtmp = predict(model$fit.ridge, x.test[, intersect(colnames(x.test), names(coef(model$fit.ridge, s="lambda.min")))], s="lambda.min")
         pred[[c]] = data.frame(gene=test.genes, mean=predtmp)      
       }
       else
@@ -50,7 +47,7 @@ birteFitRidge = function(model, mRNA.train, ref.cond=1){
     for(i in colnames(x.train)){
       x.train[intersect(names(mRNA.train), affinities[[i]]), i] = 1
     }    
-    model$fit.ridge = linearRidge(mRNA.train ~ ., data=data.frame(x.train))
+    model$fit.ridge = cv.glmnet(x.train, mRNA.train, parallel=TRUE, family="gaussian", alpha=0)
   }
   else{
     warning("MAP configuration is the empty model!")   
