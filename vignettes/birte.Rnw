@@ -81,9 +81,10 @@ affinities = list(TF=sapply(names(EColiNetwork$TF), function(tf){w = rep(1, leng
 affinities = simplify(affinities)
 affinities$other = proposeInteractions(affinities)
 # prepare data
-colnames(exprs(EColiOxygen)) = make.names(paste(pData(EColiOxygen)$GenotypeVariation, pData(EColiOxygen)$GrowthProtocol, sep="."))
-limmamRNA = limmaAnalysis(exprs(EColiOxygen), design=NULL, "wild.type.anaerobic - wild.type.aerobic")
-mydat = cbind(exprs(EColiOxygen)[,colnames(exprs(EColiOxygen)) =="wild.type.aerobic"],  exprs(EColiOxygen)[,colnames(exprs(EColiOxygen)) == "wild.type.anaerobic"])
+mydat = exprs(EColiOxygen)
+colnames(mydat) = make.names(paste(pData(EColiOxygen)$GenotypeVariation, pData(EColiOxygen)$GrowthProtocol, sep="."))
+limmamRNA = limmaAnalysis(mydat, design=NULL, "wild.type.anaerobic - wild.type.aerobic")
+mydat = cbind(mydat[,colnames(mydat) =="wild.type.aerobic"],  mydat[,colnames(exprs(EColiOxygen)) == "wild.type.anaerobic"])
 
 ecoli_result = birteLimma(dat.mRNA=mydat, limmamRNA=limmamRNA, affinities=affinities, niter=500, nburnin=5000, thin=1)
 @

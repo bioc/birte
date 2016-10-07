@@ -108,10 +108,11 @@ affinities = list(TF=sapply(names(EColiNetwork$TF), function(tf){
 w = rep(1, length(EColiNetwork$TF[[tf]])); 
 names(w)= EColiNetwork$TF[[tf]]; w}))
 # prepare data
-colnames(exprs(EColiOxygen)) = make.names(paste(pData(EColiOxygen)$GenotypeVariation, 
+mydat = exprs(EColiOxygen)
+colnames(mydat) = make.names(paste(pData(EColiOxygen)$GenotypeVariation, 
 pData(EColiOxygen)$GrowthProtocol, sep="."))
-mydat = cbind(exprs(EColiOxygen)[,colnames(exprs(EColiOxygen)) =="wild.type.aerobic"], 
-exprs(EColiOxygen)[,colnames(exprs(EColiOxygen)) == "wild.type.anaerobic"])
+mydat = cbind(mydat[,colnames(mydat) =="wild.type.aerobic"], 
+exprs(EColiOxygen)[,colnames(mydat) == "wild.type.anaerobic"])
 
 # more realistic sampling
 \dontrun{

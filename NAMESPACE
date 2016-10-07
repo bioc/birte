@@ -6,9 +6,12 @@ import(Rcpp)
 import(RcppArmadillo)
 import(Biobase)
 import(nem)
+importFrom("graphics", "abline", "hist", "lines", "plot")
+importFrom("stats", "coef", "cutree", "dbeta", "dist", "hclust", "lm",
+           "median", "model.matrix", "optim", "pbeta", "predict",
+           "qbeta", "rbinom", "runif", "sd", "toeplitz")
+importFrom("utils", "head")
 export("birteLimma", "birteRun", "getPotentialSwaps", 
        "plotConvergence", "limmaAnalysis", "simulateData", "birtePredict", "birteFitRidge",
        "simplify", "proposeInteractions", "suggestThreshold",
        "estimateNetwork")
-
-
