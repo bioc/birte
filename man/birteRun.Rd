@@ -5,9 +5,13 @@
 Main interface for Bayesian Inference of Regulatory Influence on Expression (biRte).
 }
 \description{
-The function estimates regulator activities via MCMC sampling. The function assumes experimental data of two conditions to be given. If desired, influences on mRNA log fold changes can be estimated rather than on expression levels itself.
+The function birteRun estimates regulator activities from gene expression data plus a given regulator-target gene network via MCMC sampling. The function assumes experimental data to be of one of the following formats:
+i) expression matrix (#genes x #samples) 
+ii) mRNA log fold changes
 
-Besides miRNA, mRNA and TF expression data, biRte also allows to integrate other data types (e.g. CNV data - data type 'other').
+In the first case it is now also possible to estimate regulator activity for each individual sample. In addition one can estimate condition specific regulator activity, if there are exactly two conditions.
+
+In addition to miRNA, mRNA and TF expression data, biRte also allows for integrating other data types (e.g. CNV data - data type 'other'). Note that in such a case also the corresponding regulator-target gene relationships have to be defined. 
 
 birteLimma is a convenience function, which allows to directly pass results from a previous limma analysis (see \code{\link{limmaAnalysis}}) to birteRun. When working with relative expression levels (log fold changes) birteLimma allows to deal with arbitrary complex statistical designs, including e.g. time as a covariate.
 }
@@ -20,16 +24,20 @@ birteRun(dat.mRNA, mRNA.Sigma=NULL, nrep.mRNA=c(5, 5),
     reg.interactions=FALSE, affinities, use.affinities=FALSE,    
     niter=100000, nburnin=100000, thin=50, 
     potential_swaps=NULL, only_switches=FALSE, only.diff.TFs=TRUE, 
-    explain.LFC=TRUE, model=c("no-plug-in", "all-plug-in"))
+    explain.LFC=TRUE, 
+    single.sample=FALSE, single.sample.estimator=c("mpost", "MAP"),
+    model=c("no-plug-in", "all-plug-in"))
     
-birteLimma(dat.mRNA, limmamRNA,
+birteLimma(dat.mRNA=NULL, limmamRNA,
   	data.regulators=NULL, limma.regulators=NULL, 
     fdr.regulators=NULL, lfc.regulators=NULL,
 		init.regulators=NULL, theta.regulators=NULL, 
     reg.interactions=FALSE, affinities, use.affinities=FALSE,
 	  niter=100000, nburnin=100000, thin=50, 
     potential_swaps=NULL, only_switches=FALSE, only.diff.TFs=TRUE, 
-    explain.LFC=TRUE, model=c("no-plug-in", "all-plug-in"))
+    explain.LFC=TRUE, 
+    single.sample=FALSE, single.sample.estimator=c("mpost", "MAP"),
+    model=c("no-plug-in", "all-plug-in"))
 }
 \arguments{
   \item{dat.mRNA}{mRNA expression data matrix. IMPORTANT: Replicates must be ordered according to nrep.mRNA}
@@ -45,7 +53,7 @@ birteLimma(dat.mRNA, limmamRNA,
   \item{theta.regulators}{list with at most 3 components (miRNA, TF, other). If single numbers are provided, each component contains the expected fraction of active regulators. If vectors are provided, each vector entry corresponds to the individual probability of a specific regulator to be active. Accordingly, vectors should be named in agreement with the regulator-target gene network. If affinities$other corresponds to interaction terms between regulators, theta.regulators can also be provided as a #regulators x #regulators matrix.}
   \item{reg.interactions}{If TRUE, entries of affinities$other are interpreted as interaction terms between regulators.}
   
-  \item{affinities}{Regulator-target gene interactions. This is a list with at most three components (TF, miRNA, other). Each of these lists again contains a weighted adjacency list representation. See \code{\link{humanNetworkSimul}} for an example. IMPORTANT: gene names used in this network have to match with row names of dat.mRNA. Moreover, regulator names have to fit to row names of the corresponding data matrices.} 
+  \item{affinities}{Regulator-target gene interactions. This is a list with at most three components (TF, miRNA, other). Each of these lists again contains a weighted adjacency list representation. See \code{\link{humanNetworkSimul}} for an example. IMPORTANT: gene names used in this network have to match with row names of dat.mRNA. Moreover, regulator names have to fit to row names of the corresponding data matrices. It is assumed that in presence of regulators of type "other", there exist also miRNA regulators. If you want to circumvent this behavior (e.g. you want to use CNVs, but *no* miRNAs), store these regulators in the slot "miRNA".} 
   \item{use.affinities}{Should weights given in the bipartite regulator-target gene graph given a specific meaning? If yes, it is assumed that weights correspond to quantitative influences of regulators on their targets.}
   
   \item{niter}{Number of MCMC iterations (AFTER burnin).}
@@ -59,10 +67,12 @@ birteLimma(dat.mRNA, limmamRNA,
   \item{lfc.regulators}{list with at most 3 components (miRNA, TF, other). Each component contains the log fold change cutoff for differential expression. It is assumed to be 0, if not provided.}
   \item{fdr.regulators}{list with at most 3 components (miRNA, TF, other). Each component contains the FDR cutoff for differential expression (DEFAULT: 0.05).}
   \item{explain.LFC}{If yes, biRte tries to explain mRNA log fold changes rather than expression levels itself.}
+  \item{single.sample}{If yes, biRte tries to explain mRNA data for each individual sample. The output is a #samples x #regulators matrix.}
+  \item{single.sample.estimator}{Which type of estimate for regulator activity should be provided? mpost = marginal posterior activity probability for each regulator; MAP = most likely regulator configuration found during MCMC sampling}
   \item{model}{If "no-plug-in", for marginal log likelihoods are considered for regulator specific expression data. Otherwise, (posterior) variance estimates are used directly.}
 }
 \value{
-The function returns a list containing the following entries:
+If single.sample is FALSE, the function returns a list containing the following entries:
   \item{post}{#regulators x #conditions matrix containing the marginal probability for each regulator to influence mRNA expression.}
   \item{map}{#regulators x #conditions matrix containing the regulator configuration with highest joint probability.}       
   \item{coef}{matrix of #conditions x #replicates: Each entry is itself a matrix (embedded into a list) of #coefficients x #effective samples. The data contains the expected regression coefficients.}
@@ -77,6 +87,7 @@ The function returns a list containing the following entries:
   \item{design}{design matrix effectively used for model training}
   \item{param}{estimated parameters for mRNA precision (i.e. inverse variance) distribution}
   
+If single.sample is TRUE the output is a #samples x #regulator matrix.
 }
 \author{
 Holger Froehlich

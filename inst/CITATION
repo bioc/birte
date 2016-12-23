@@ -8,7 +8,7 @@
               title = "biRte: Bayesian Inference of Context Specific Regulator Activities and Transcriptional Networks",
               author = personList(as.person("Holger Froehlich")),
               journal="Bioinformatics",
-              number="",
-              pages="",                                  
+              number="31 (20)",
+              pages="3290-3298",                                  
               year = "2015",              
-              textVersion = "Holger Froehlich (2015). biRte: Bayesian Inference of Context Specific Regulator Activities and Transcriptional Networks. Bioinformatics. in press")
+              textVersion = "Holger Froehlich (2015). biRte: Bayesian Inference of Context Specific Regulator Activities and Transcriptional Networks. Bioinformatics. 31(20):3290-3298")

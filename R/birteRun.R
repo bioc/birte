@@ -36,10 +36,10 @@ birte.limma.aux = function(limmamiRNA, dat.miRNA, lfc, fdr, explain.LFC=TRUE){
 }
 
 # convenience function using limma
-birteLimma = function(dat.mRNA, limmamRNA,
+birteLimma = function(dat.mRNA=NULL, limmamRNA,
 		data.regulators=NULL, limma.regulators=NULL, fdr.regulators=NULL, lfc.regulators=NULL, 
 		init.regulators=NULL, theta.regulators=NULL, reg.interactions=FALSE, affinities, use.affinities=FALSE,
-		niter=100000, nburnin=100000, thin=50, potential_swaps=NULL, only_switches=FALSE, only.diff.TFs=TRUE, explain.LFC=TRUE, model=c("no-plug-in", "all-plug-in")){
+		niter=100000, nburnin=100000, thin=50, potential_swaps=NULL, only_switches=FALSE, only.diff.TFs=TRUE, explain.LFC=TRUE, single.sample=FALSE, single.sample.estimator=c("mpost", "MAP"), model=c("no-plug-in", "all-plug-in")){
 
   if(is.null(limmamRNA))
     stop("Please provide argument limmamRNA!")
@@ -47,15 +47,19 @@ birteLimma = function(dat.mRNA, limmamRNA,
   stopifnot(!is.null(limmamRNA$design))
   if(is.null(limmamRNA$pvalue.tab$ID))
     limmamRNA$pvalue.tab$ID = rownames(limmamRNA$pvalue.tab)
-  if(!explain.LFC){
+  if(is.null(dat.mRNA) && (!explain.LFC || single.sample))
+    stop("Please provide gene expression data matrix!")
+  if(!explain.LFC && !single.sample){ 
     stopifnot(NCOL(limmamRNA$design) == 2)
     groups = lapply(1:NCOL(limmamRNA$design), function(i) which(limmamRNA$design[,i] == 1))  
     dat.mRNA = dat.mRNA[,as.vector(unlist(groups))]
     nrep.mRNA = sapply(groups, length)	
   }
   else{
-    dat.mRNA = as.matrix(limmamRNA$pvalue.tab$logFC)
-    rownames(dat.mRNA) = limmamRNA$pvalue.tab$ID
+    if(explain.LFC && !single.sample){
+      dat.mRNA = as.matrix(limmamRNA$pvalue.tab$logFC)
+      rownames(dat.mRNA) = limmamRNA$pvalue.tab$ID
+    }
     nrep.mRNA = c(1,1)
   }
   stopifnot(!is.null(dat.mRNA))		
@@ -67,7 +71,7 @@ birteLimma = function(dat.mRNA, limmamRNA,
   for(regulator.type in names(limma.regulators)){
     cat(regulator.type, "==> ")
     if(!is.null(limma.regulators[[regulator.type]])){
-      res = birte.limma.aux(limma.regulators[[regulator.type]], data.regulators[[regulator.type]], lfc.regulators[[regulator.type]], fdr.regulators[[regulator.type]], explain.LFC=explain.LFC)
+      res = birte.limma.aux(limma.regulators[[regulator.type]], data.regulators[[regulator.type]], lfc.regulators[[regulator.type]], fdr.regulators[[regulator.type]], explain.LFC=(explain.LFC|single.sample))
     }
     else
       res = NULL
@@ -81,7 +85,7 @@ birteLimma = function(dat.mRNA, limmamRNA,
 					data.regulators=dat, sigma.regulators=sigma,nrep.regulators=nrep, diff.regulators = diff.exp,
 					init.regulators=init.regulators, theta.regulators=theta.regulators,	reg.interactions=reg.interactions, 				
 					affinities=affinities, use.affinities=use.affinities, 
-					niter=niter, nburnin=nburnin, thin=thin, potential_swaps=potential_swaps, only_switches=only_switches, only.diff.TFs=only.diff.TFs, explain.LFC=explain.LFC, model=model)
+					niter=niter, nburnin=nburnin, thin=thin, potential_swaps=potential_swaps, only_switches=only_switches, only.diff.TFs=only.diff.TFs, explain.LFC=explain.LFC, single.sample=single.sample, single.sample.estimator=single.sample.estimator, model=model)
 	res
 }
 
@@ -89,10 +93,11 @@ birteLimma = function(dat.mRNA, limmamRNA,
 birteRun = function(dat.mRNA, mRNA.Sigma=NULL, nrep.mRNA=c(5, 5), df.mRNA=sum(nrep.mRNA)-2,
 		data.regulators=NULL, sigma.regulators=NULL, nrep.regulators=NULL, diff.regulators=NULL, 
 		init.regulators=NULL, theta.regulators=NULL, reg.interactions=FALSE, affinities, use.affinities=FALSE,
-    niter=100000, nburnin=100000, thin=50, potential_swaps=NULL, only_switches=FALSE, only.diff.TFs=TRUE, explain.LFC=TRUE, model=c("no-plug-in", "all-plug-in")) {
+    niter=100000, nburnin=100000, thin=50, potential_swaps=NULL, only_switches=FALSE, only.diff.TFs=TRUE, explain.LFC=TRUE, single.sample=FALSE, single.sample.estimator=c("mpost", "MAP"), model=c("no-plug-in", "all-plug-in")) {
   
   
   model = match.arg(model, several.ok=FALSE)  
+  single.sample.estimator = match.arg(single.sample.estimator, several.ok = FALSE)
 	if(is.null(affinities))
 		stop("Please provide regulator binding affinities! The TF-target and miRNA-target networks are required to run biRte!")	
 	if(length(affinities) > 3)
@@ -106,19 +111,25 @@ birteRun = function(dat.mRNA, mRNA.Sigma=NULL, nrep.mRNA=c(5, 5), df.mRNA=sum(nr
 	if(!(any(c("TF", "miRNA", "other") %in% names(affinities))))
 		stop("Regulator types have to be one of 'TF', 'miRNA', 'other'")
 	stopifnot(all(names(data.regulators) %in% names(affinities)))
-  if(length(nrep.mRNA) != 2)
+  if(length(nrep.mRNA) != 2 && !explain.LFC && !single.sample)
     stop("biRte assumes exactly two conditions!")
-	#
+	
 	cat("Formatting regulator-target network -> checking overlap between network and measurements.\n")	
 	C_cnt = length(nrep.mRNA)
 	alpha0 = alpha = alpha.para = beta.para = genesets = theta.regulators2 = init.regulators2 = data.regulators2 = regulators.data.type = potential_swaps2 = sigma.regulators2 = logFC.reg = list()
 	alltargets = c()
 	all.regulators = c()	
   affinities.orig = affinities
+  if(single.sample)
+    explain.LFC = FALSE
   if(explain.LFC)
     cat("--> biRte tries to explain mRNA log fold changes\n")
-  else
-    cat("--> biRte tries to explain condition specific mRNA expression\n")
+  else{
+    if(single.sample)
+      cat("--> biRte tries to explain sample specific mRNA expression\n")
+    else
+      cat("--> biRte tries to explain condition specific mRNA expression\n")
+  }
   if(is.null(mRNA.Sigma) && all(nrep.mRNA > 1) && NCOL(dat.mRNA) > 1){
     warning("No SDs for mRNA data provided --> trying to automatically build limma model and deduce standard deviations ...")
     colnames(dat.mRNA) = c(rep("condition1", nrep.mRNA[1]), rep("condition2", nrep.mRNA[2]))    
@@ -140,7 +151,7 @@ birteRun = function(dat.mRNA, mRNA.Sigma=NULL, nrep.mRNA=c(5, 5), df.mRNA=sum(nr
 		myaffinities = affinities[[regulator.type]]		
 		res = birte.aux(model=model, regulator.type=regulator.type, C_cnt=C_cnt, nrep.mRNA=nrep.mRNA, dat.mRNA=dat.mRNA, dat.miRNA=data.regulators[[regulator.type]], 
 				miRNA.data.type="array", miRNA.Sigma=sigma.regulators[[regulator.type]], nrep.miRNA=nrep.regulators[[regulator.type]], diff.miRNA=diff.regulators[[regulator.type]], 
-				init_miR=init.regulators[[regulator.type]], theta_miRNA=theta.regulators[[regulator.type]], affinitiesmiRNA=myaffinities, use.affinities=use.affinities, only.switches=only_switches, potential_swaps=potential_swaps, only.diff.TFs=only.diff.TFs, explain.LFC=explain.LFC)
+				init_miR=init.regulators[[regulator.type]], theta_miRNA=theta.regulators[[regulator.type]], affinitiesmiRNA=myaffinities, use.affinities=use.affinities, only.switches=only_switches, potential_swaps=potential_swaps, only.diff.TFs=only.diff.TFs, explain.LFC=explain.LFC|single.sample)
 		data.regulators2[[regulator.type]] = res$dat		
 		alpha0[[regulator.type]] = res$alpha0
 		alpha[[regulator.type]] = res$alpha
@@ -154,7 +165,7 @@ birteRun = function(dat.mRNA, mRNA.Sigma=NULL, nrep.mRNA=c(5, 5), df.mRNA=sum(nr
 		potential_swaps2[[regulator.type]] = res$potential_swaps
 		sigma.regulators2[[regulator.type]] = res$sigma
     logFC.reg[[regulator.type]] = res$logFC    
-		if(explain.LFC){
+		if(explain.LFC || single.sample){
 			if(!is.null(res$dat)){
 				nrep = nrep.regulators[[regulator.type]][1]
 				n = NCOL(data.regulators[[regulator.type]])
@@ -174,7 +185,7 @@ birteRun = function(dat.mRNA, mRNA.Sigma=NULL, nrep.mRNA=c(5, 5), df.mRNA=sum(nr
   #  
   reg.type.nprov = setdiff(c("TF", "miRNA", "other"), names(affinities))
   for(r in reg.type.nprov){
-    if(explain.LFC)
+    if(explain.LFC || single.sample)
       nrep.regulators[[r]] = 0
     else	
       nrep.regulators[[r]] = rep(0, C_cnt)
@@ -211,34 +222,59 @@ birteRun = function(dat.mRNA, mRNA.Sigma=NULL, nrep.mRNA=c(5, 5), df.mRNA=sum(nr
 	alpha.mRNA = est$estimate[1]
 	beta.mRNA = est$estimate[2]    
 	var.post = (2*beta.mRNA + df.mRNA*mRNA.Sigma^2) / (2*alpha.mRNA + df.mRNA) # limma estimate of posterior mean
-	if(explain.LFC){
-    if(all(nrep.mRNA == 1)) # log FCs provided
+	if(explain.LFC || single.sample){
+    if(all(nrep.mRNA == 1) || single.sample) # log FCs or single sample data provided
       logFC = dat.mRNA
     else{
 	    mu = cbind(apply(dat.mRNA[,1:nrep.mRNA[1]], 1, mean), apply(dat.mRNA[,(nrep.mRNA[1] + 1):NCOL(dat.mRNA)], 1, mean))
 	    rownames(mu) = rownames(dat.mRNA)  	
 		  logFC = mu[,2] - mu[,1]	    
     }
-		dat.mRNA = logFC / var.post
+		dat.mRNA = logFC / sqrt(var.post) # z-score
 		nrep.mRNA = 1					    
 	}	
   else{
-    dat.mRNA = t(sapply(1:NROW(dat.mRNA), function(i) dat.mRNA[i,] / var.post[i]))
+    dat.mRNA = t(sapply(1:NROW(dat.mRNA), function(i) (dat.mRNA[i,] - mean(dat.mRNA[i,])) / sqrt(var.post[i]))) # z-score
   }	
   # post normalization:
   beta.mRNA = alpha.mRNA # expectation=1 and variance = 1/alpha
-	res = birteStart(mRNAexpr=dat.mRNA, miRNAexpr=data.regulators2$miRNA, Qexpr=data.regulators2$other, nrep.mRNA=nrep.mRNA, nrep.miRNA=nrep.regulators$miRNA, nrep.TF=nrep.regulators$TF, nrep.Q=nrep.regulators$other,
-			mRNA.data.type="array", miRNA.data.type=regulators.data.type$miRNA, Qexpr.data.type=regulators.data.type$other,
-			genesetsTF=genesets$TF, genesetsmiRNA=genesets$miRNA, genesetsothers=genesets$other,
-			alpha_i=alpha$miRNA, alpha_i0=alpha0$miRNA, alpha_i0Q=alpha0$other, alpha_iQ=alpha$other,
-			alphamiR=alpha.para$miRNA, betamiR=beta.para$miRNA, alphaQ=alpha.para$other, betaQ=beta.para$other,
-			niter=niter, burnin=nburnin, thin=thin, model=model, 
-			only_switches=only_switches, nomiRNA=is.null(genesets$miRNA), noTF=is.null(genesets$TF), affinitiesTF=affinities$TF, affinitiesmiRNA=affinities$miRNA, affinitiesothers=affinities$other,
-			potential_swaps=potential_swaps2, 
-			theta_TF=theta.regulators2$TF, theta_miRNA=theta.regulators2$miRNA, theta_other=theta.regulators2$other, K=K, interactions=interactions,
-			A_sigma=sigma.regulators2$miRNA, O_sigma=mRNA.Sigma, Q_sigma=sigma.regulators2$other, init_S=init.regulators2$miRNA, init_T=init.regulators2$TF, init_other=init.regulators2$other, 
-			TFexpr=data.regulators2$TF, TFexpr.data.type=regulators.data.type$TF, 
-			alpha_i0TF=alpha0$TF, alpha_iTF=alpha$TF, TF_sigma=sigma.regulators2$TF, alphaTF=alpha.para$TF, betaTF=beta.para$TF, alpha=alpha.mRNA, beta=beta.mRNA)	
+  # start sampling:
+  if(single.sample){
+    activities = c()
+    for(i in 1:NCOL(dat.mRNA)){
+      res = birteStart(mRNAexpr=dat.mRNA[,i], miRNAexpr=data.regulators2$miRNA, Qexpr=data.regulators2$other, nrep.mRNA=1, nrep.miRNA=1, nrep.TF=1, nrep.Q=1,
+                       mRNA.data.type="array", miRNA.data.type=regulators.data.type$miRNA, Qexpr.data.type=regulators.data.type$other,
+                       genesetsTF=genesets$TF, genesetsmiRNA=genesets$miRNA, genesetsothers=genesets$other,
+                       alpha_i=alpha$miRNA, alpha_i0=alpha0$miRNA, alpha_i0Q=alpha0$other, alpha_iQ=alpha$other,
+                       alphamiR=alpha.para$miRNA, betamiR=beta.para$miRNA, alphaQ=alpha.para$other, betaQ=beta.para$other,
+                       niter=niter, burnin=nburnin, thin=thin, model=model, 
+                       only_switches=only_switches, nomiRNA=is.null(genesets$miRNA), noTF=is.null(genesets$TF), affinitiesTF=affinities$TF, affinitiesmiRNA=affinities$miRNA, affinitiesothers=affinities$other,
+                       potential_swaps=potential_swaps2, 
+                       theta_TF=theta.regulators2$TF, theta_miRNA=theta.regulators2$miRNA, theta_other=theta.regulators2$other, K=K, interactions=interactions,
+                       A_sigma=sigma.regulators2$miRNA, O_sigma=mRNA.Sigma, Q_sigma=sigma.regulators2$other, init_S=init.regulators2$miRNA, init_T=init.regulators2$TF, init_other=init.regulators2$other, 
+                       TFexpr=data.regulators2$TF, TFexpr.data.type=regulators.data.type$TF, 
+                       alpha_i0TF=alpha0$TF, alpha_iTF=alpha$TF, TF_sigma=sigma.regulators2$TF, alphaTF=alpha.para$TF, betaTF=beta.para$TF, alpha=alpha.mRNA, beta=beta.mRNA)	
+      if(single.sample.estimator == "MAP")
+        activities = rbind(activities, t(res$map))
+      else
+        activities = rbind(activities, t(res$post))
+    }
+    rownames(activities) = colnames(dat.mRNA)
+    return(activities) # matrix of sample-wise MAP activities
+  }
+  else
+  	res = birteStart(mRNAexpr=dat.mRNA, miRNAexpr=data.regulators2$miRNA, Qexpr=data.regulators2$other, nrep.mRNA=nrep.mRNA, nrep.miRNA=nrep.regulators$miRNA, nrep.TF=nrep.regulators$TF, nrep.Q=nrep.regulators$other,
+  			mRNA.data.type="array", miRNA.data.type=regulators.data.type$miRNA, Qexpr.data.type=regulators.data.type$other,
+  			genesetsTF=genesets$TF, genesetsmiRNA=genesets$miRNA, genesetsothers=genesets$other,
+  			alpha_i=alpha$miRNA, alpha_i0=alpha0$miRNA, alpha_i0Q=alpha0$other, alpha_iQ=alpha$other,
+  			alphamiR=alpha.para$miRNA, betamiR=beta.para$miRNA, alphaQ=alpha.para$other, betaQ=beta.para$other,
+  			niter=niter, burnin=nburnin, thin=thin, model=model, 
+  			only_switches=only_switches, nomiRNA=is.null(genesets$miRNA), noTF=is.null(genesets$TF), affinitiesTF=affinities$TF, affinitiesmiRNA=affinities$miRNA, affinitiesothers=affinities$other,
+  			potential_swaps=potential_swaps2, 
+  			theta_TF=theta.regulators2$TF, theta_miRNA=theta.regulators2$miRNA, theta_other=theta.regulators2$other, K=K, interactions=interactions,
+  			A_sigma=sigma.regulators2$miRNA, O_sigma=mRNA.Sigma, Q_sigma=sigma.regulators2$other, init_S=init.regulators2$miRNA, init_T=init.regulators2$TF, init_other=init.regulators2$other, 
+  			TFexpr=data.regulators2$TF, TFexpr.data.type=regulators.data.type$TF, 
+  			alpha_i0TF=alpha0$TF, alpha_iTF=alpha$TF, TF_sigma=sigma.regulators2$TF, alphaTF=alpha.para$TF, betaTF=beta.para$TF, alpha=alpha.mRNA, beta=beta.mRNA)	
 	#
   res$affinities = affinities.orig  	
   res$explain.LFC = explain.LFC  
@@ -246,7 +282,7 @@ birteRun = function(dat.mRNA, mRNA.Sigma=NULL, nrep.mRNA=c(5, 5), df.mRNA=sum(nr
   res
 }
 
-#  auxilliary function
+#  auxilliary function for setting parameters for each regulator type
 birte.aux = function(model="all-plug-in", regulator.type, C_cnt, dat.mRNA, nrep.mRNA, dat.miRNA, miRNA.data.type="array", miRNA.Sigma, nrep.miRNA, diff.miRNA, init_miR, theta_miRNA, affinitiesmiRNA, use.affinities, only.switches, potential_swaps, only.diff.TFs, explain.LFC){			
 	alpha_i0 = alpha.miRNA = alpha.miR = beta.miR = miRNA.data.type = NULL	
 	if(length(affinitiesmiRNA) > 0 ) {
@@ -300,9 +336,10 @@ birte.aux = function(model="all-plug-in", regulator.type, C_cnt, dat.mRNA, nrep.
 			names(alpha_i0) = rownames(dat.miRNA)
 			if(model == "all-plug-in")
 				stopifnot(rownames(dat.miRNA) == rownames(miRNA.Sigma))
-			stopifnot(length(nrep.miRNA) == length(nrep.mRNA))			
+			if(!explain.LFC)
+			  stopifnot(length(nrep.miRNA) == length(nrep.mRNA))			
 			cat(length(diff.miRNA), " differential regulators of type" , regulator.type, "found\n")	     	
-			if(length(nrep.miRNA) != 2){
+			if(length(nrep.miRNA) != 2 && !explain.LFC){
 				warning(paste(regulator.type, "data does not contain 2 conditions! It will be ignored for model inference!\n"))
 				dat.miRNA = NULL				
 			}

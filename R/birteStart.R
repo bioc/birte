@@ -165,8 +165,10 @@ birteStart <- function(mRNAexpr, miRNAexpr=NULL, mRNA.data.type=c("array", "RNAs
     result$design[intersect(rownames(mRNAexpr), names(affinities[[i]])), i] = affinities[[i]][intersect(rownames(mRNAexpr), names(affinities[[i]]))]
   } 	
   for(c in 1:C_cnt){
-    for(r in 1:NCOL(result$coef))
-      rownames(result$coef[c,r][[1]]) = colnames(result$design)    
+    for(r in 1:NCOL(result$coef)){
+      if(NROW(result$coef[c,r][[1]]) > 0)
+        rownames(result$coef[c,r][[1]]) = colnames(result$design)    
+    }
   }  	
 	result$nburnin = burnin  
   result$C_cnt = C_cnt;  

@@ -84,7 +84,7 @@ affinities$other = proposeInteractions(affinities)
 mydat = exprs(EColiOxygen)
 colnames(mydat) = make.names(paste(pData(EColiOxygen)$GenotypeVariation, pData(EColiOxygen)$GrowthProtocol, sep="."))
 limmamRNA = limmaAnalysis(mydat, design=NULL, "wild.type.anaerobic - wild.type.aerobic")
-mydat = cbind(mydat[,colnames(mydat) =="wild.type.aerobic"],  mydat[,colnames(exprs(EColiOxygen)) == "wild.type.anaerobic"])
+mydat = cbind(mydat[,colnames(mydat) =="wild.type.aerobic"],  mydat[,colnames(mydat) == "wild.type.anaerobic"])
 
 ecoli_result = birteLimma(dat.mRNA=mydat, limmamRNA=limmamRNA, affinities=affinities, niter=500, nburnin=5000, thin=1)
 @
@@ -204,6 +204,15 @@ if(require(Rgraphviz) & require(nem)){
 \caption{Inferred network between active TFs.}
 \label{figure3}
 \end{figure}
+
+\section{Regulator Activities in Single Samples}
+One may ask, in how far activity of regulators differs from one sample to another. \Rpackage{biRte} now allows for addressing such a question. Essentially, the idea is to run \Rpackage{biRte}'s Bayesian inference procedure independently for each single sample. That means for each individual sample we look for the regulator combination that could explain the observed expression level of genes. The output is a samples x regulators matrix containing either the marginal posterior probabilities for each regulator to be active in a certain sample, or the most likely configurations of active regulators in each sample. In our example we run single sample analysis as follows:
+
+
+<<single sample, echo=TRUE, results=hide>>=
+ss_ecoli_TFexpr = birteLimma(dat.mRNA=mydat, data.regulators=list(TF=exprs(TFexpr)), limmamRNA=limmamRNA, limma.regulators=list(TF=limmaTF), theta.regulators=list(TF=theta.TF, other=theta.other), init.regulators=list(TF=init.TF, other=init.other), affinities=affinities, niter=500, nburnin=1000, thin=1, only.diff.TFs=TRUE, single.sample = TRUE)
+ss_ecoli_TFexpr[,colSums(ss_ecoli_TFexpr) > 0] # regulators that are active in at least one sample
+@
 
 \section{Conclusion}
 \Rpackage{biRte} integrates regulator expression and mRNA data into a probabilistic framework to make inference on regulator activities. It is a step towards the important goal to unravel causal mechanisms of gene expression changes under specific experimental or natural conditions. A unique feature is the combination with network inference.
