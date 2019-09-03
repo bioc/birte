@@ -1,5 +1,5 @@
 Package: birte
-Version: 1.21.0
+Version: 1.21.1
 Date: 2015-06-16
 Title: Bayesian Inference of Regulatory Influence on Expression (biRte)
 Author: Holger Froehlich, contributions by Benedikt Zacher
@@ -34,3 +34,4 @@ biocViews: Microarray, Sequencing, GeneExpression, Transcription,
 LazyLoad: yes
 VignetteBuilder: knitr
 Packaged: 2016-08-03 01:44:00 UTC; biocbuild
+PackageStatus: Deprecated
